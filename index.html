@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wiom CSP — Exit Flows (Voluntary · B1 · B2)</title>
+<style>
+  :root{
+    --brand:#D9008D; --brand-pressed:#A30070;
+    --text-1:#161021; --text-2:#5C5570; --text-hint:#A7A1B2; --text-on-warn:#372902;
+    --bg-screen:#FAF9FC; --bg-surface:#FFFFFF; --bg-neutral:#F1EDF7;
+    --bg-warning:#FFF2BF; --bg-negative:#FFE5E7;
+    --state-positive:#008043; --state-negative:#D92130; --state-caution:#E65100;
+    --stroke-1:#E8E4F0; --stroke-2:#D7D3E0; --stroke-critical:#FFB3B9; --stroke-warn-focus:#FF8000;
+    --r-lg:16px; --r-md:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Noto Sans","Segoe UI",system-ui,sans-serif;background:var(--bg-neutral);color:var(--text-1);
+    -webkit-font-smoothing:antialiased;padding:28px 16px 64px;line-height:1.45}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.2px}
+  .sub{color:var(--text-2);font-size:14px;margin-top:6px;max-width:680px}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 4px}
+  .seg{display:inline-flex;background:var(--bg-surface);border:1px solid var(--stroke-2);border-radius:999px;padding:4px}
+  .seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:700;color:var(--text-2);
+    padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+  .seg.flow button[aria-pressed="true"]{background:var(--text-1);color:#fff}
+  .seg.scr button[aria-pressed="true"]{background:var(--brand);color:#fff}
+  .hint{font-size:12px;color:var(--text-hint)}
+  .stage{display:grid;grid-template-columns:390px 1fr;gap:30px;margin-top:20px;align-items:start}
+  @media(max-width:820px){.stage{grid-template-columns:1fr}}
+  .phone{width:390px;max-width:100%;background:var(--bg-screen);border-radius:36px;border:1px solid var(--stroke-2);
+    box-shadow:0 20px 54px rgba(22,16,33,.15);overflow:hidden}
+  .sb{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:700}
+  .screen{min-height:720px;display:flex;flex-direction:column;position:relative}
+  .body{flex:1;padding:0 22px;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;gap:14px;padding:14px 20px 16px}
+  .topbar .bk{font-size:20px;color:var(--text-2)}
+  .topbar h2{font-size:16px;font-weight:700}
+
+  /* Blocker — reads like a formal notice */
+  .notice-kicker{font-size:16px;font-weight:800;color:var(--state-negative);letter-spacing:.4px}
+  .notice-rule{height:2px;background:var(--state-negative);margin:8px 0 18px}
+  .headline{font-size:24px;font-weight:800;line-height:1.32;color:var(--text-1)}
+  .lead{font-size:16px;color:var(--text-2);margin-top:14px;line-height:1.5}
+  .wc-label{font-size:14px;font-weight:700;color:var(--text-hint);margin-top:32px}
+  .wc-row{display:flex;align-items:center;gap:14px;padding:9px 0}
+  .wc-dot{width:5px;height:5px;border-radius:50%;flex:none;background:var(--text-2)}
+  .wc-row span{font-size:16px;color:var(--text-1)}
+  .spacer{flex:1;min-height:24px}
+  .foot{padding:16px 22px 22px}
+  .cta{display:block;width:100%;text-align:center;font-size:16px;font-weight:800;border:0;cursor:pointer;
+    padding:16px;border-radius:var(--r-md);background:var(--brand);color:#fff}
+  .cta:active{background:var(--brand-pressed)}
+
+  /* Home + banner */
+  .strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 20px}
+  .tile{background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:13px 14px}
+  .tile .k{font-size:12px;color:var(--text-2)} .tile .v{font-size:18px;font-weight:800;margin-top:3px}
+  .banner{margin:8px 20px;border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;align-items:center;
+    background:var(--bg-warning)}
+  .banner .ic{font-size:16px;line-height:1.2}
+  .banner .t{font-size:11px;font-weight:700;color:var(--text-on-warn);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .banner .s{font-size:12px;font-weight:700;color:var(--text-on-warn);margin-top:4px}
+  .banner .cv{margin-left:auto;color:var(--text-on-warn);opacity:.55;font-size:18px}
+  .empty{text-align:center;color:var(--text-2);margin-top:60px}
+  .empty .h{font-size:16px;font-weight:700;color:var(--text-1)}
+
+  /* Timeline */
+  .tl-anchor{font-size:15px;color:var(--brand);font-weight:600;padding:0 22px;margin-top:2px}
+  .tl-card{margin:16px 22px;background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-lg);padding:18px}
+  .tl-h{font-size:16px;font-weight:800;margin-bottom:14px}
+  .step{display:flex;gap:13px}
+  .rail{display:flex;flex-direction:column;align-items:center}
+  .node{width:14px;height:14px;border-radius:50%;margin-top:2px;flex:none;display:grid;place-items:center;font-size:10px;color:#fff}
+  .line{width:2px;flex:1;background:var(--stroke-2);min-height:30px}
+  .step .c{padding-bottom:18px}
+  .step .lab{font-size:15px;font-weight:700}
+  .step .lab .d{font-weight:500;color:var(--text-2);font-size:13px}
+  .step .aff{font-size:13px;color:var(--text-2);margin-top:2px}
+  .step.up .lab{color:var(--text-hint);font-weight:500}
+  .reason{padding:14px 22px 0} .reason .eb{font-size:12px;font-weight:700} .reason .hl{font-size:20px;font-weight:800;margin-top:4px}
+  .conseq-note{font-size:13px;color:var(--text-2);margin-top:20px;padding:12px 14px;background:var(--bg-neutral);border-radius:var(--r-md);line-height:1.45}
+  .abort{margin:0 22px 16px;background:var(--bg-warning);border-radius:var(--r-md);padding:14px 16px}
+  .abort .ab-h{font-size:14px;font-weight:700;color:var(--text-on-warn)}
+  .abort .ab-d{font-size:12.5px;color:var(--text-on-warn);opacity:.85;margin-top:4px}
+
+  .notes h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-hint);margin:2px 0 8px}
+  .notes .box{background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:16px;margin-bottom:12px}
+  .notes p{font-size:13.5px;color:var(--text-2);margin:5px 0} .notes b{color:var(--text-1)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Wiom CSP — Exit Flows <span style="font-weight:500;color:var(--text-hint);font-size:15px">· Voluntary · B1 · B2</span></h1>
+  <p class="sub">All three exit journeys as built in the app. <b>Voluntary</b> — CSP leaves on their own (opt-in, cancelable). <b>B1 · Viability</b> / <b>B2 · Integrity</b> — Wiom-initiated (full-page notice, no appeal). Toggle the flow, then walk the screens.</p>
+
+  <div class="controls">
+    <div class="seg flow" role="group" aria-label="Flow">
+      <button data-flow="vol" aria-pressed="false">Voluntary</button>
+      <button data-flow="b1" aria-pressed="true">B1 · Viability</button>
+      <button data-flow="b2" aria-pressed="false">B2 · Integrity</button>
+    </div>
+    <div class="seg scr" role="group" aria-label="Screen">
+      <button data-scr="0" aria-pressed="true">Full-page blocker</button>
+      <button data-scr="1" aria-pressed="false">Home banner</button>
+      <button data-scr="2" aria-pressed="false">Timeline</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="phone"><div class="sb"><span>9:41</span><span>▲ ⋯ 🔋</span></div><div class="screen" id="screen"></div></div>
+    <div class="notes" id="notes"></div>
+  </div>
+</div>
+
+<script>
+const WC = ["अब आपको नए काम या कनेक्शन नहीं मिलेंगे","आपके चालू काम अब Wiom का सिस्टम संभालेगा","आपका पैसा सेटल होगा और डिवाइस वापस होंगे"];
+const WI_BANNER={t:"Wiom के साथ अब आपकी साझेदारी समाप्त की जा रही है", s:"स्थिति देखें"};
+const FLOWS = {
+  vol:{ kind:"voluntary", accent:"var(--brand)",
+    eyebrow:"आपने खुद बाहर निकलने का फैसला किया है",
+    title:"Wiom के साथ आपकी साझेदारी समाप्त हो रही है",
+    intro:"बाहर निकलने से पहले समझ लें कि क्या-क्या बदलेगा:",
+    consequences:["❌ नए काम मिलने बंद हो जाएंगे","📦 सभी डिवाइस वापस करने होंगे","🔄 ग्राहक दूसरे पार्टनर को चले जाएंगे","💰 वॉलेट सेटलमेंट होगा"],
+    note:"ℹ️ माइग्रेशन शुरू होने से पहले तक आप कभी भी रद्द कर सकते हैं।",
+    cta:"आगे बढ़ें", banner:{t:"Wiom छोड़ने की प्रक्रिया चालू है", s:"स्थिति देखें"}, abortable:true,
+    steps:[
+      {k:"done",lab:"काम आ रहा है",d:""},
+      {k:"done",lab:"बाहर निकलने का अनुरोध दर्ज",d:"16 जुलाई 2026"},
+      {k:"cur", lab:"नोटिस अवधि",d:"16 – 30 जुलाई",aff:"रूटिंग और दिखावट जारी है"},
+      {k:"up",  lab:"काम बंद है",d:"30 जुलाई – 2 अगस्त",aff:"नए कनेक्शन बंद"},
+      {k:"up",  lab:"ग्राहक माइग्रेशन",d:"2 – 23 अगस्त",aff:"ग्राहक दूसरे पार्टनर को · वापसी संभव नहीं"},
+      {k:"up",  lab:"फाइनल सेटलमेंट",d:"23 – 30 अगस्त",aff:"वॉलेट सेटलमेंट + डिवाइस वापसी"},
+      {k:"up",  lab:"प्रक्रिया पूरी",d:"30 अगस्त"} ] },
+  b1:{ kind:"blocker", accent:"var(--state-caution)",
+    eyebrow:"प्रदर्शन समीक्षा · Performance review",
+    title:"Wiom के साथ अब आपकी साझेदारी समाप्त की जा रही है",
+    body:"पिछले कुछ समय से आपका काम दिए गए टारगेट से नीचे रहा।",
+    cta:"ठीक है, समझ गया", banner:WI_BANNER, abortable:false,
+    steps:[
+      {k:"done",lab:"बाहर निकलने की प्रक्रिया शुरू",d:"16 जुलाई 2026",aff:"यहीं से समयसीमा शुरू होती है"},
+      {k:"cur", lab:"काम बंद है",d:"16 जुलाई से",aff:"नए काम / कनेक्शन मिलने बंद"},
+      {k:"up",  lab:"फाइनल सेटलमेंट",d:"23 – 30 जुलाई",aff:"वॉलेट सेटलमेंट + डिवाइस वापसी"},
+      {k:"up",  lab:"प्रक्रिया पूरी",d:"30 जुलाई"} ] },
+  b2:{ kind:"blocker", accent:"var(--state-negative)",
+    eyebrow:"नियम उल्लंघन · Rule violation",
+    title:"Wiom के साथ अब आपकी साझेदारी समाप्त की जा रही है",
+    body:"नियम तोड़ने के कारण यह फ़ैसला लिया गया है।",
+    cta:"ठीक है, समझ गया", banner:WI_BANNER, abortable:false,
+    steps:[
+      {k:"done",lab:"बाहर निकलने की प्रक्रिया शुरू",d:"16 जुलाई 2026",aff:"यहीं से समयसीमा शुरू होती है"},
+      {k:"cur", lab:"काम बंद है",d:"16 जुलाई से",aff:"नए कनेक्शन बंद"},
+      {k:"up",  lab:"सेटलमेंट + डिवाइस वापसी",d:"23 – 30 जुलाई"},
+      {k:"up",  lab:"प्रक्रिया पूरी",d:"30 जुलाई"} ] }
+};
+let flow="b1", scr=0;
+const $=s=>document.querySelector(s);
+
+function blocker(f){
+  return `<div class="body" style="padding-top:44px">
+      <div class="notice-kicker">सूचना</div>
+      <div class="notice-rule"></div>
+      <div class="headline">${f.title}</div>
+      <div class="lead">${f.body}</div>
+      <div class="wc-label">अब क्या बदलेगा</div>
+      ${WC.map(c=>`<div class="wc-row"><span class="wc-dot"></span><span>${c}</span></div>`).join("")}
+      <div class="spacer"></div>
+    </div>
+    <div class="foot"><button class="cta">${f.cta}</button></div>`;
+}
+function home(f){
+  return `<div class="topbar"><h2>Rajesh Kumar · एडमिन</h2></div>
+    <div class="strip">
+      <div class="tile"><div class="k">कनेक्शन</div><div class="v">18<span style="color:var(--text-hint);font-size:13px">/45</span></div></div>
+      <div class="tile"><div class="k">सेवा स्थिति</div><div class="v" style="color:var(--state-caution);font-size:15px">⚠️ 2 समस्याएं</div></div>
+      <div class="tile"><div class="k">कमाई</div><div class="v">₹10,740</div></div>
+      <div class="tile"><div class="k">काम की स्थिति</div><div class="v" style="color:var(--state-positive)">✓</div></div>
+    </div>
+    <div class="banner"><span class="ic">⚠️</span><div style="min-width:0"><div class="t">${f.banner.t}</div><div class="s">${f.banner.s}</div></div><span class="cv">›</span></div>
+    <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>काम आने पर यहाँ दिखेगा</div></div>`;
+}
+function node(kind){
+  if(kind==="done")return `<div class="node" style="background:var(--state-positive)">✓</div>`;
+  if(kind==="cur") return `<div class="node" style="background:var(--brand)"></div>`;
+  return `<div class="node" style="background:var(--stroke-2)"></div>`;
+}
+function consequences(f){
+  return `<div class="topbar"><span class="bk">‹</span><h2>Wiom छोड़ें</h2></div>
+    <div class="body" style="padding-top:8px">
+      <div class="headline" style="font-size:20px">${f.intro}</div>
+      <div style="margin-top:18px">
+      ${f.consequences.map(c=>`<div class="wc-row"><span>${c}</span></div>`).join("")}
+      </div>
+      <div class="conseq-note">${f.note}</div>
+      <div class="spacer"></div>
+    </div>
+    <div class="foot"><button class="cta">${f.cta}</button></div>`;
+}
+function firstScreen(f){ return f.kind==="voluntary" ? consequences(f) : blocker(f); }
+function timeline(f){
+  const rows=f.steps.map((s,i)=>`<div class="step ${s.k==='up'?'up':''}">
+      <div class="rail">${node(s.k)}${i===f.steps.length-1?"":'<div class="line"></div>'}</div>
+      <div class="c"><div class="lab">${s.lab}${s.d?` <span class="d">· ${s.d}</span>`:""}</div>${s.aff?`<div class="aff">${s.aff}</div>`:""}</div></div>`).join("");
+  const abort = f.abortable ? `<div class="abort"><div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div><div class="ab-d">माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं</div></div>` : "";
+  return `<div class="topbar"><span class="bk">‹</span><h2>बाहर निकलने की स्थिति</h2></div>
+    <div class="reason"><div class="eb" style="color:${f.accent}">${f.eyebrow}</div><div class="hl">${f.title}</div></div>
+    <div class="tl-anchor">प्रक्रिया 16 जुलाई 2026 से शुरू</div>
+    <div class="tl-card"><div class="tl-h">आगे क्या होगा</div>${rows}</div>
+    ${abort}`;
+}
+
+function render(){
+  const f=FLOWS[flow];
+  $("#screen").innerHTML = scr===0?firstScreen(f) : scr===1?home(f) : timeline(f);
+  document.querySelector('.seg.scr button[data-scr="0"]').textContent = f.kind==="voluntary" ? "Consequences" : "Full-page blocker";
+  const detail = {
+    vol:"CSP-initiated (from CI Detail). Opt-in <b>consequences</b> screen → declare → <b>abortable</b> timeline. Full journey with notice + migration.",
+    b1:"Wiom-initiated · underperformance — <b>no blame</b>. Full-page blocker, no appeal.",
+    b2:"Wiom-initiated · rule violation — <b>final</b>. Full-page blocker, no appeal.",
+  };
+  $("#notes").innerHTML=`
+    <h3>The three exit flows</h3>
+    <div class="box"><p><b>Voluntary</b> — CSP leaves on their own · cancelable.</p>
+      <p><b>B1 · Viability</b> — Wiom-initiated (underperformance).</p>
+      <p><b>B2 · Integrity</b> — Wiom-initiated (rule violation).</p></div>
+    <h3>Screens</h3>
+    <div class="box"><p><b>1</b> — ${f.kind==="voluntary"?"Consequences (opt-in, deliberate)":"Full-page blocker (forced, no back)"}</p>
+      <p><b>2 · Home banner</b> — tap → status timeline.</p>
+      <p><b>3 · Timeline</b> — dated states${f.abortable?" + cancel option":", no appeal"}.</p></div>
+    <h3>${flow==="vol"?"Voluntary":flow==="b2"?"B2 · Integrity":"B1 · Viability"}</h3>
+    <div class="box"><p>${detail[flow]}</p></div>`;
+}
+document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow;
+  document.querySelectorAll(".seg.flow button").forEach(x=>x.setAttribute("aria-pressed",x===b));render();});
+document.querySelectorAll(".seg.scr button").forEach(b=>b.onclick=()=>{scr=+b.dataset.scr;
+  document.querySelectorAll(".seg.scr button").forEach(x=>x.setAttribute("aria-pressed",x===b));render();});
+render();
+</script>
+</body>
+</html>
