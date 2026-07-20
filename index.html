@@ -170,9 +170,10 @@ const FLOWS = {
       {k:"up",  lab:"फाइनल सेटलमेंट",d:"23 – 30 जुलाई",aff:"वॉलेट सेटलमेंट + डिवाइस वापसी"},
       {k:"up",  lab:"प्रक्रिया पूरी",d:"30 जुलाई"} ] },
   b2:{ kind:"blocker",
-    reason:"कारण- नियमों का उल्लंघन",
+    reason:"कारण- ग्राहक से तय कीमत से ज़्यादा पैसे लिए गए",
     title:"Wiom के साथ अब आपकी साझेदारी समाप्त की जा रही है",
     body:"नियम तोड़ने के कारण यह फ़ैसला लिया गया है।",
+    violations:["अतिरिक्त कैश — ग्राहक से तय कीमत से ज़्यादा पैसे लिए गए","कनेक्शन: 98XX XXX 212 · रीचार्ज 12 जून 2026"],
     contactNote:"इस बारे में हमारी टीम आपसे सीधे बात करेगी।",
     statusLink:false,
     cta:"मैं समझ गया", banner:WI_BANNER, abortable:false,
@@ -189,13 +190,14 @@ function sync(){ document.querySelectorAll('.seg.scr button').forEach(x=>x.setAt
 
 function blocker(f){
   const link = f.statusLink ? `<div class="statuslink" onclick="nav('service')">अपने काम की स्थिति देखें ›</div>` : "";
+  const reason = (f.violations&&f.violations.length) ? `<div class="v-reason"><div class="h">कारण</div>${f.violations.map((v,i)=>`<div class="r"${i===0?' style="font-weight:700"':""}>${v}</div>`).join("")}</div>` : "";
   const note = f.contactNote ? `<div class="contact-note">🤝 ${f.contactNote}</div>` : "";
   return `<div class="body" style="padding-top:44px">
       <div class="notice-kicker">सूचना</div>
       <div class="notice-rule"></div>
       <div class="headline">${f.title}</div>
       <div class="lead">${f.body}</div>
-      ${link}${note}
+      ${link}${reason}${note}
       <div class="wc-label">अब क्या बदलेगा</div>
       ${WC.map(c=>`<div class="wc-row"><span class="wc-dot"></span><span>${c}</span></div>`).join("")}
       <div class="spacer"></div>
