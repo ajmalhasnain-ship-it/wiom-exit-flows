@@ -148,6 +148,11 @@
   .abort{margin:0 22px 16px;background:var(--bg-warning);border-radius:var(--r-md);padding:14px 16px}
   .abort .ab-h{font-size:14px;font-weight:700;color:var(--text-on-warn)}
   .abort .ab-d{font-size:12.5px;color:var(--text-on-warn);opacity:.85;margin-top:4px}
+  .abort .ab-pnr{font-size:12.5px;font-weight:700;color:var(--state-caution);margin-top:6px}
+  .cta-outline{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;cursor:pointer;
+    padding:12px;border-radius:var(--r-md);background:var(--bg-surface);color:var(--brand);
+    border:1.5px solid var(--brand);margin-top:14px}
+  .cta-outline:active{background:var(--brand-tint)}
 
   .notes h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-hint);margin:2px 0 8px}
   .notes .box{background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:16px;margin-bottom:12px}
@@ -181,15 +186,19 @@ const WI_BANNER={t:"Wiom के साथ अब आपकी साझेदा
 const FLOWS = {
   vol:{ kind:"voluntary",
     reason:"आपने खुद बाहर निकलने का फैसला किया है",
-    title:"Wiom के साथ आपकी साझेदारी समाप्त हो रही है",
+    title:"बाहर निकलने का अनुरोध दर्ज हो गया",
+    anchor:"अगला: नोटिस अवधि · 30 जुलाई तक",
     intro:"बाहर निकलने से पहले समझ लें कि क्या-क्या बदलेगा:",
     consequences:["❌ नए काम मिलने बंद हो जाएंगे","📦 सभी डिवाइस वापस करने होंगे","🔄 ग्राहक दूसरे पार्टनर को चले जाएंगे","💰 वॉलेट सेटलमेंट होगा"],
     note:"ℹ️ माइग्रेशन शुरू होने से पहले तक आप कभी भी रद्द कर सकते हैं।",
     cta:"आगे बढ़ें", banner:{t:"Wiom छोड़ने की प्रक्रिया चालू है", s:"स्थिति देखें"}, abortable:true, statusLink:false,
+    abortDeadline:"माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं",
+    pointOfNoReturn:"एक बार ग्राहक माइग्रेशन शुरू हुआ तो रद्द नहीं कर पाएंगे",
+    abortCta:"अनुरोध वापस लें",
     steps:[
       {k:"done",lab:"काम आ रहा है",d:""},
-      {k:"done",lab:"बाहर निकलने का अनुरोध दर्ज",d:"16 जुलाई 2026"},
-      {k:"cur", lab:"नोटिस अवधि",d:"16 – 30 जुलाई",aff:"रूटिंग और दिखावट जारी है"},
+      {k:"cur", lab:"बाहर निकलने का अनुरोध दर्ज",d:"16 जुलाई 2026",aff:"अभी कुछ नहीं बदला"},
+      {k:"up",  lab:"नोटिस अवधि",d:"16 – 30 जुलाई",aff:"रूटिंग और दिखावट जारी"},
       {k:"up",  lab:"काम बंद है",d:"30 जुलाई – 2 अगस्त",aff:"नए कनेक्शन बंद"},
       {k:"up",  lab:"ग्राहक माइग्रेशन",d:"2 – 23 अगस्त",aff:"ग्राहक दूसरे पार्टनर को · वापसी संभव नहीं"},
       {k:"up",  lab:"फाइनल सेटलमेंट",d:"23 – 30 अगस्त",aff:"वॉलेट सेटलमेंट + डिवाइस वापसी"},
@@ -361,7 +370,12 @@ function timeline(f){
   const rows=f.steps.map((s,i)=>`<div class="step ${s.k==='up'?'up':''}">
       <div class="rail">${nodeEl(s.k)}${i===f.steps.length-1?"":'<div class="line"></div>'}</div>
       <div class="c"><div class="lab">${s.lab}${s.d?` <span class="d">· ${s.d}</span>`:""}</div>${s.aff?`<div class="aff">${s.aff}</div>`:""}</div></div>`).join("");
-  const abort = f.abortable ? `<div class="abort"><div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div><div class="ab-d">माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं</div></div>` : "";
+  const abort = f.abortable ? `<div class="abort">
+      <div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div>
+      <div class="ab-d">${f.abortDeadline||"माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं"}</div>
+      ${f.pointOfNoReturn?`<div class="ab-pnr">${f.pointOfNoReturn}</div>`:""}
+      ${f.abortCta?`<button class="cta-outline" onclick="nav('vhome')">${f.abortCta}</button>`:""}
+    </div>` : "";
   return `<div class="topbar"><span class="bk" onclick="nav('${flow==='vol'?'vhome':'home'}')">‹</span><h2>बाहर निकलने की स्थिति</h2></div>
     <div class="reason"><div class="eb">${f.reason}</div><div class="hl">${f.title}</div></div>
     ${f.anchor?`<div class="tl-anchor">${f.anchor}</div>`:""}
