@@ -76,14 +76,15 @@
   .empty .h{font-size:16px;font-weight:700;color:var(--text-1)}
 
   /* Service status (काम की स्थिति) */
-  .ss-hero{margin:6px 22px 0;font-size:14px;color:var(--text-2)}
-  .ss-card{margin:14px 22px 0;background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:16px}
-  .ss-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--stroke-1)}
+  .ss-state{margin:8px 22px 0;background:var(--bg-warning);border-radius:var(--r-md);padding:12px 14px;font-size:14px;font-weight:700;color:var(--text-on-warn);display:flex;gap:8px;align-items:center}
+  .ss-secl{margin:16px 22px 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-hint)}
+  .ss-card{margin:8px 22px 0;background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:2px 16px}
+  .ss-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--stroke-1);gap:12px}
   .ss-row:last-child{border-bottom:0}
-  .ss-row .lbl{font-size:14px;color:var(--text-1)}
-  .ss-row .val{font-size:15px;font-weight:800}
-  .ss-row .val small{font-weight:500;color:var(--text-hint);font-size:12px}
-  .ss-note{margin:16px 22px;font-size:13.5px;color:var(--state-caution);font-weight:600}
+  .ss-row .lbl{font-size:14px;font-weight:600;color:var(--text-1)}
+  .ss-row .sub{font-size:12px;color:var(--text-hint);margin-top:2px}
+  .ss-row .val{font-size:17px;font-weight:800;flex:none}
+  .ss-note{margin:18px 22px;font-size:13.5px;color:var(--state-caution);font-weight:600}
 
   /* Timeline */
   .reason{padding:14px 22px 0}
@@ -125,7 +126,7 @@
     </div>
     <div class="seg scr" role="group" aria-label="Screen">
       <button data-screen="first" aria-pressed="true">First screen</button>
-      <button data-screen="service">काम की स्थिति</button>
+      <button data-screen="service">सेवा स्थिति</button>
       <button data-screen="home">Home banner</button>
       <button data-screen="timeline">Timeline</button>
     </div>
@@ -187,7 +188,7 @@ function sync(){ document.querySelectorAll('.seg.scr button').forEach(x=>x.setAt
 
 function blocker(f){
   const link = f.statusLink ? `<div class="statuslink" onclick="nav('service')">अपने काम की स्थिति देखें ›</div>` : "";
-  const viol = f.violations ? `<div class="v-reason"><div class="h">उल्लंघन के कारण</div>${f.violations.map(v=>`<div class="r">• ${v}</div>`).join("")}</div>` : "";
+  const viol = f.violations ? `<div class="v-reason"><div class="h">कौन सा नियम तोड़ा गया</div>${f.violations.map(v=>`<div class="r">• ${v}</div>`).join("")}</div>` : "";
   return `<div class="body" style="padding-top:44px">
       <div class="notice-kicker">सूचना</div>
       <div class="notice-rule"></div>
@@ -212,15 +213,20 @@ function consequences(f){
 }
 function firstScreen(f){ return f.kind==="voluntary" ? consequences(f) : blocker(f); }
 function service(f){
-  return `<div class="topbar"><span class="bk" onclick="nav('first')">‹</span><h2>काम की स्थिति</h2></div>
-    <div class="ss-hero">पिछले 3 महीने का प्रदर्शन — टारगेट से नीचे</div>
+  return `<div class="topbar"><span class="bk" onclick="nav('first')">‹</span><h2>सेवा स्थिति</h2></div>
+    <div class="ss-state"><span>⚠️</span><span>सेवा स्थिति खतरे में — 2 चीज़ें सुधारें</span></div>
+    <div class="ss-secl">सुधारने की ज़रूरत</div>
     <div class="ss-card">
-      <div class="ss-row"><span class="lbl">नए कनेक्शन</span><span class="val" style="color:var(--state-negative)">18 <small>/ 45 टारगेट</small></span></div>
-      <div class="ss-row"><span class="lbl">रीचार्ज दर</span><span class="val" style="color:var(--state-negative)">58% <small>/ 85% टारगेट</small></span></div>
-      <div class="ss-row"><span class="lbl">सर्विस क्वालिटी</span><span class="val" style="color:var(--state-caution)">कमज़ोर</span></div>
-      <div class="ss-row"><span class="lbl">समस्याएं (unresolved)</span><span class="val" style="color:var(--state-negative)">2</span></div>
+      <div class="ss-row"><div><div class="lbl">समय पर समाधान</div><div class="sub">लक्ष्य 90% से अधिक · ↓ घट रहा</div></div><span class="val" style="color:var(--state-negative)">84%</span></div>
+      <div class="ss-row"><div><div class="lbl">देर तक खुली शिकायतें</div><div class="sub">लक्ष्य 5 से कम</div></div><span class="val" style="color:var(--state-negative)">9</span></div>
     </div>
-    <div class="ss-note">⚠️ इसी वजह से आपकी साझेदारी की समीक्षा की गई।</div>`;
+    <div class="ss-secl">ठीक चल रहा है</div>
+    <div class="ss-card">
+      <div class="ss-row"><div><div class="lbl">समय पर इंस्टॉल</div><div class="sub">लक्ष्य 95% से अधिक</div></div><span class="val" style="color:var(--state-positive)">96%</span></div>
+      <div class="ss-row"><div><div class="lbl">अपटाइम</div><div class="sub">लक्ष्य 98% से अधिक</div></div><span class="val" style="color:var(--state-positive)">99%</span></div>
+      <div class="ss-row"><div><div class="lbl">सर्विस रेटिंग</div><div class="sub">लक्ष्य 4.0 से अधिक</div></div><span class="val" style="color:var(--state-positive)">4.3</span></div>
+    </div>
+    <div class="ss-note">⚠️ इन्हें समय रहते सुधारने से साझेदारी बच सकती थी।</div>`;
 }
 function home(f){
   return `<div class="topbar"><h2>Rajesh Kumar · एडमिन</h2></div>
@@ -245,8 +251,7 @@ function timeline(f){
   const abort = f.abortable ? `<div class="abort"><div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div><div class="ab-d">माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं</div></div>` : "";
   return `<div class="topbar"><span class="bk" onclick="nav('home')">‹</span><h2>बाहर निकलने की स्थिति</h2></div>
     <div class="reason"><div class="eb">${f.reason}</div><div class="hl">${f.title}</div></div>
-    <div class="tl-anchor">प्रक्रिया 16 जुलाई 2026 से शुरू</div>
-    <div class="tl-card"><div class="tl-h">आगे क्या होगा</div>${rows}</div>
+    <div class="tl-card" style="margin-top:16px"><div class="tl-h">आगे क्या होगा</div>${rows}</div>
     ${abort}`;
 }
 
