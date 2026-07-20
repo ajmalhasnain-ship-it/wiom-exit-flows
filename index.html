@@ -84,6 +84,9 @@
   .dr-exit{display:flex;align-items:center;gap:14px;padding:16px 20px;font-size:15px;font-weight:800;
     color:var(--state-negative);cursor:pointer;border-top:1px solid var(--stroke-1)}
   .dr-exit:hover{background:var(--bg-negative)} .dr-exit .cv{margin-left:auto;opacity:.5}
+  .dr-exit.plain{border-top:0}
+  .st-list{flex:1;overflow:auto;display:flex;flex-direction:column}
+  .st-sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--text-hint);padding:18px 20px 4px}
 
   /* Confirm bottom-sheet */
   .sheet-wrap{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;z-index:6}
@@ -150,7 +153,7 @@
 <body>
 <div class="wrap">
   <h1>Wiom CSP — Exit Flows <span style="font-weight:500;color:var(--text-hint);font-size:15px">· interactive</span></h1>
-  <p class="sub">Fully clickable prototype. <b>Voluntary</b> = self-exit: start on <b>Home</b>, tap the <b>☰ hamburger</b> → <b>मेन्यू</b> → <b>Wiom छोड़ें</b> → consequences → confirm → timeline. <b>B1 / B2</b> = Wiom-initiated: a full-page notice → timeline. Toggle the flow to compare.</p>
+  <p class="sub">Fully clickable prototype. <b>Voluntary</b> = self-exit: start on <b>Home</b>, tap the <b>☰ hamburger</b> → <b>सेटिंग्स</b> → खाता → <b>Wiom के साथ काम बंद करें</b> → consequences → confirm → timeline. <b>B1 / B2</b> = Wiom-initiated: a full-page notice → timeline. Toggle the flow to compare.</p>
 
   <div class="controls">
     <div class="seg flow" role="group" aria-label="Flow">
@@ -214,7 +217,7 @@ const FLOWS = {
       {k:"up",  lab:"प्रक्रिया पूरी",d:"30 जुलाई"} ] }
 };
 const SCREENS={
-  vol:[["vhome","Home"],["drawer","मेन्यू"],["first","Consequences"],["confirm","Confirm"],["timeline","Timeline"]],
+  vol:[["vhome","Home"],["settings","सेटिंग्स"],["first","Consequences"],["confirm","Confirm"],["timeline","Timeline"]],
   b1:[["first","Full-page notice"],["service","सेवा स्थिति"],["home","Home banner"],["timeline","Timeline"]],
   b2:[["first","Full-page notice"],["home","Home banner"],["timeline","Timeline"]],
 };
@@ -245,7 +248,7 @@ function blocker(f){
     <div class="foot"><button class="cta" onclick="nav('timeline')">${f.cta}</button></div>`;
 }
 function consequences(f){
-  return `<div class="topbar"><span class="bk" onclick="nav('drawer')">‹</span><h2>Wiom छोड़ें</h2></div>
+  return `<div class="topbar"><span class="bk" onclick="nav('settings')">‹</span><h2>Wiom छोड़ें</h2></div>
     <div class="body" style="padding-top:8px">
       <div class="headline" style="font-size:20px">${f.intro}</div>
       <div style="margin-top:18px">${f.consequences.map(c=>`<div class="wc-row"><span>${c}</span></div>`).join("")}</div>
@@ -256,7 +259,7 @@ function consequences(f){
 }
 function drItem(ic,lab){return `<div class="dr-item"><span class="di-ic">${ic}</span><span>${lab}</span></div>`;}
 function vhome(f){
-  return `<div class="topbar"><span class="ham" onclick="nav('drawer')">☰</span><h2>Rajesh Kumar · एडमिन</h2></div>
+  return `<div class="topbar"><span class="ham" onclick="nav('settings')">☰</span><h2>Rajesh Kumar · एडमिन</h2></div>
     <div class="strip">
       <div class="tile"><div class="k">कनेक्शन</div><div class="v">18<span style="color:var(--text-hint);font-size:13px">/45</span></div></div>
       <div class="tile"><div class="k">सेवा स्थिति</div><div class="v" style="color:var(--state-positive);font-size:15px">✓ ठीक है</div></div>
@@ -264,24 +267,23 @@ function vhome(f){
       <div class="tile"><div class="k">काम की स्थिति</div><div class="v" style="color:var(--state-positive)">✓</div></div>
     </div>
     <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>काम आने पर यहाँ दिखेगा</div></div>
-    <div class="tap-hint">बाहर निकलने के लिए ☰ मेन्यू → Wiom छोड़ें</div>`;
+    <div class="tap-hint">☰ मेन्यू → सेटिंग्स → खाता → Wiom के साथ काम बंद करें</div>`;
 }
-function drawer(f){
-  return `<div class="drawer-wrap">
-    <div class="drawer">
+// Settings screen (mirrors the app's SettingsHomeScreen). The exit lives HERE,
+// inside the खाता section — not as a top-level drawer item.
+function settings(f){
+  return `<div class="topbar"><span class="bk" onclick="nav('vhome')">‹</span><h2>सेटिंग्स</h2></div>
+    <div class="st-list">
       <div class="dr-head"><div class="dr-av">RK</div><div><div class="dr-name">Rajesh Kumar</div><div class="dr-role">एडमिन · CSP · Wiom</div></div></div>
-      <div class="dr-list">
-        ${drItem("👤","प्रोफ़ाइल")}
-        ${drItem("👛","वॉलेट")}
-        ${drItem("📦","NetBox")}
-        ${drItem("👥","मेरी टीम")}
-        ${drItem("🌐","भाषा")}
-        ${drItem("❓","मदद और सहायता")}
-      </div>
-      <div class="dr-exit" onclick="nav('first')"><span class="di-ic">🚪</span><span>Wiom छोड़ें</span><span class="cv">›</span></div>
-    </div>
-    <div class="dr-scrim" onclick="nav('vhome')"></div>
-  </div>`;
+      ${drItem("👤","प्रोफ़ाइल")}
+      ${drItem("🪪","केवाईसी")}
+      ${drItem("🌐","भाषा चुनें")}
+      ${drItem("↩️","लॉगआउट")}
+      <div class="st-sec">दस्तावेज़</div>
+      ${drItem("📄","नियम व दस्तावेज़")}
+      <div class="st-sec">खाता</div>
+      <div class="dr-exit plain" onclick="nav('first')"><span class="di-ic">🚪</span><span>Wiom के साथ काम बंद करें</span><span class="cv">›</span></div>
+    </div>`;
 }
 function confirm(f){
   return `<div class="sheet-wrap">
@@ -343,7 +345,7 @@ function timeline(f){
 function renderScreen(f){
   switch(screen){
     case "vhome":   return vhome(f);
-    case "drawer":  return drawer(f);
+    case "settings":return settings(f);
     case "confirm": return confirm(f);
     case "service": return service(f);
     case "home":    return home(f);
@@ -360,10 +362,10 @@ function render(){
     b2:"Rule violation · final. Reason is shown (Enforcement OS · FPV): the <b>violation type</b> + a direct-contact line to contest. <span class='tag'>FPV: reason in-app</span>",
   };
   const inter={
-    vol:`<p><b>☰ hamburger</b> (top-left) → opens the <b>menu drawer</b>.</p>
-      <p><b>Wiom छोड़ें</b> (drawer, red) → <b>consequences</b>.</p>
+    vol:`<p><b>☰ hamburger</b> (top-left) → opens <b>सेटिंग्स</b>.</p>
+      <p>In Settings, scroll to <b>खाता</b> → <b>Wiom के साथ काम बंद करें</b> (red) → <b>consequences</b>.</p>
       <p><b>आगे बढ़ें</b> → <b>confirm sheet</b> → <b>हाँ, बाहर निकलें</b> → timeline.</p>
-      <p><b>रद्द करें</b> / scrim → back to home. <b>‹ back</b> arrows navigate too.</p>`,
+      <p><b>रद्द करें</b> → back to home. <b>‹ back</b> arrows navigate too.</p>`,
     b1:`<p><b>CTA</b> → opens the <b>exit timeline</b>.</p>
       <p><b>अपने काम की स्थिति देखें</b> → <b>service status</b> page.</p>
       <p><b>Home banner</b> → exit timeline.</p>`,
