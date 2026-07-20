@@ -58,7 +58,9 @@
   .tile{background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:13px 14px}
   .tile .k{font-size:12px;color:var(--text-2)} .tile .v{font-size:18px;font-weight:800;margin-top:3px}
   .banner{margin:8px 20px;border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;align-items:center;
-    background:var(--bg-warning)}
+    background:var(--bg-warning);cursor:pointer;transition:filter .15s, transform .06s}
+  .banner:hover{filter:brightness(.97)}
+  .banner:active{transform:scale(.99)}
   .banner .ic{font-size:16px;line-height:1.2}
   .banner .t{font-size:11px;font-weight:700;color:var(--text-on-warn);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .banner .s{font-size:12px;font-weight:700;color:var(--text-on-warn);margin-top:4px}
@@ -177,7 +179,7 @@ function home(f){
       <div class="tile"><div class="k">कमाई</div><div class="v">₹10,740</div></div>
       <div class="tile"><div class="k">काम की स्थिति</div><div class="v" style="color:var(--state-positive)">✓</div></div>
     </div>
-    <div class="banner"><span class="ic">⚠️</span><div style="min-width:0"><div class="t">${f.banner.t}</div><div class="s">${f.banner.s}</div></div><span class="cv">›</span></div>
+    <div class="banner" onclick="go(2)"><span class="ic">⚠️</span><div style="min-width:0"><div class="t">${f.banner.t}</div><div class="s">${f.banner.s}</div></div><span class="cv">›</span></div>
     <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>काम आने पर यहाँ दिखेगा</div></div>`;
 }
 function node(kind){
@@ -210,6 +212,12 @@ function timeline(f){
     ${abort}`;
 }
 
+// Banner tap → jump to the Timeline screen (mirrors the on-device deep link).
+function go(n){
+  scr=n;
+  document.querySelectorAll('.seg.scr button').forEach(x=>x.setAttribute('aria-pressed', (+x.dataset.scr)===n));
+  render();
+}
 function render(){
   const f=FLOWS[flow];
   $("#screen").innerHTML = scr===0?firstScreen(f) : scr===1?home(f) : timeline(f);
