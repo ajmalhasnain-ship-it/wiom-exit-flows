@@ -55,6 +55,7 @@
   .v-reason{margin-top:16px;background:var(--bg-negative);border-radius:var(--r-md);padding:12px 14px}
   .v-reason .h{font-size:13px;font-weight:800;color:var(--state-negative)}
   .v-reason .r{font-size:14px;color:var(--text-1);padding:4px 0 0}
+  .contact-note{margin-top:16px;font-size:14px;color:var(--text-2);line-height:1.5}
   .spacer{flex:1;min-height:20px}
   .foot{padding:16px 22px 22px}
   .cta{display:block;width:100%;text-align:center;font-size:16px;font-weight:800;border:0;cursor:pointer;
@@ -172,7 +173,7 @@ const FLOWS = {
     reason:"कारण- नियमों का उल्लंघन",
     title:"Wiom के साथ अब आपकी साझेदारी समाप्त की जा रही है",
     body:"नियम तोड़ने के कारण यह फ़ैसला लिया गया है।",
-    violations:["फर्जी / नकली कनेक्शन बनाना","डिवाइस से छेड़छाड़ या उसे बेचना","पैसों में धोखाधड़ी"],
+    contactNote:"इस बारे में हमारी टीम आपसे सीधे बात करेगी।",
     statusLink:false,
     cta:"मैं समझ गया", banner:WI_BANNER, abortable:false,
     steps:[
@@ -188,13 +189,13 @@ function sync(){ document.querySelectorAll('.seg.scr button').forEach(x=>x.setAt
 
 function blocker(f){
   const link = f.statusLink ? `<div class="statuslink" onclick="nav('service')">अपने काम की स्थिति देखें ›</div>` : "";
-  const viol = f.violations ? `<div class="v-reason"><div class="h">कौन सा नियम तोड़ा गया</div>${f.violations.map(v=>`<div class="r">• ${v}</div>`).join("")}</div>` : "";
+  const note = f.contactNote ? `<div class="contact-note">🤝 ${f.contactNote}</div>` : "";
   return `<div class="body" style="padding-top:44px">
       <div class="notice-kicker">सूचना</div>
       <div class="notice-rule"></div>
       <div class="headline">${f.title}</div>
       <div class="lead">${f.body}</div>
-      ${link}${viol}
+      ${link}${note}
       <div class="wc-label">अब क्या बदलेगा</div>
       ${WC.map(c=>`<div class="wc-row"><span class="wc-dot"></span><span>${c}</span></div>`).join("")}
       <div class="spacer"></div>
@@ -263,7 +264,7 @@ function render(){
   const d={
     vol:"CSP-initiated · cancelable. Opt-in consequences → declare → abortable timeline.",
     b1:"Underperformance · no blame. Notice + a link to <b>काम की स्थिति</b> (why), then the exit timeline.",
-    b2:"Rule violation · final. Notice shows the violation reasons, then the exit timeline. <span class='tag'>reason is representative</span>",
+    b2:"Rule violation · final. Per the Exit-OS spec the <b>reason is NOT detailed in-app</b> — it's human-delivered, so the notice shows only a direct-contact line. <span class='tag'>spec: no evidence in-app</span>",
   };
   $("#notes").innerHTML=`
     <h3>Interactions (click the phone)</h3>
