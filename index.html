@@ -189,6 +189,7 @@ const FLOWS = {
   b1:{ kind:"blocker",
     reason:"कारण- काम हमेशा टारगेट से नीचे रहा",
     title:"Wiom के साथ आपका काम अब बंद किया जा रहा है।",
+    anchor:"प्रक्रिया 16 जुलाई 2026 से शुरू",
     body:"पिछले 2-3 महीने से आपका काम टारगेट से नीचे रहा।",
     statusLink:true,
     cta:"ठीक है, समझ गया", banner:WI_BANNER, abortable:false,
@@ -200,6 +201,7 @@ const FLOWS = {
   b2:{ kind:"blocker",
     reason:"कारण- ग्राहक से तय कीमत से ज़्यादा पैसे लिए गए",
     title:"Wiom के साथ आपका काम अब बंद किया जा रहा है।",
+    anchor:"प्रक्रिया 16 जुलाई 2026 से शुरू",
     body:"नियम तोड़ने के कारण यह फ़ैसला लिया गया है।",
     violations:["अतिरिक्त कैश — ग्राहक से तय कीमत से ज़्यादा पैसे लिए गए"],
     contactNote:"इस बारे में हमारी टीम आपसे सीधे बात करेगी।",
@@ -333,6 +335,7 @@ function timeline(f){
   const abort = f.abortable ? `<div class="abort"><div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div><div class="ab-d">माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं</div></div>` : "";
   return `<div class="topbar"><span class="bk" onclick="nav('${flow==='vol'?'vhome':'home'}')">‹</span><h2>बाहर निकलने की स्थिति</h2></div>
     <div class="reason"><div class="eb">${f.reason}</div><div class="hl">${f.title}</div></div>
+    ${f.anchor?`<div class="tl-anchor">${f.anchor}</div>`:""}
     <div class="tl-card" style="margin-top:16px"><div class="tl-h">आगे क्या होगा</div>${rows}</div>
     ${abort}`;
 }
