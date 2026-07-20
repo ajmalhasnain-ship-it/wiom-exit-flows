@@ -61,6 +61,40 @@
   .cta{display:block;width:100%;text-align:center;font-size:16px;font-weight:800;border:0;cursor:pointer;
     padding:16px;border-radius:var(--r-md);background:var(--brand);color:#fff}
   .cta:active{background:var(--brand-pressed)}
+  .cta-ghost{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;border:0;cursor:pointer;
+    padding:14px;border-radius:var(--r-md);background:transparent;color:var(--text-2);margin-top:6px}
+  .cta-ghost:active{background:var(--bg-neutral)}
+  .ham{font-size:22px;color:var(--text-1);cursor:pointer;line-height:1;padding:2px 4px}
+  .tap-hint{margin:20px 22px 0;font-size:12.5px;font-weight:700;color:var(--brand);background:var(--brand-tint);
+    border-radius:999px;padding:9px 14px;text-align:center}
+
+  /* Hamburger drawer */
+  .drawer-wrap{position:absolute;inset:0;display:flex;z-index:5}
+  .drawer{width:300px;max-width:82%;background:var(--bg-surface);display:flex;flex-direction:column;
+    box-shadow:2px 0 24px rgba(22,16,33,.18);animation:slideIn .18s ease}
+  @keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+  .dr-scrim{flex:1;background:rgba(22,16,33,.42);cursor:pointer}
+  .dr-head{display:flex;align-items:center;gap:12px;padding:26px 20px 18px;border-bottom:1px solid var(--stroke-1)}
+  .dr-av{width:44px;height:44px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;
+    display:grid;place-items:center;font-size:16px;flex:none}
+  .dr-name{font-size:16px;font-weight:800} .dr-role{font-size:12px;color:var(--text-2);margin-top:2px}
+  .dr-list{padding:8px 0;flex:1;overflow:auto}
+  .dr-item{display:flex;align-items:center;gap:14px;padding:14px 20px;font-size:15px;font-weight:600;color:var(--text-1);cursor:pointer}
+  .dr-item:hover{background:var(--bg-neutral)}
+  .dr-item .di-ic{font-size:17px;width:22px;text-align:center}
+  .dr-exit{display:flex;align-items:center;gap:14px;padding:16px 20px;font-size:15px;font-weight:800;
+    color:var(--state-negative);cursor:pointer;border-top:1px solid var(--stroke-1)}
+  .dr-exit:hover{background:var(--bg-negative)} .dr-exit .cv{margin-left:auto;opacity:.5}
+
+  /* Confirm bottom-sheet */
+  .sheet-wrap{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;z-index:6}
+  .sheet-scrim{position:absolute;inset:0;background:rgba(22,16,33,.42);cursor:pointer}
+  .sheet{position:relative;background:var(--bg-surface);border-radius:22px 22px 0 0;padding:10px 22px 24px;
+    animation:sheetUp .2s ease}
+  @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .sheet-grab{width:40px;height:4px;border-radius:99px;background:var(--stroke-2);margin:4px auto 16px}
+  .sheet-h{font-size:19px;font-weight:800;line-height:1.35}
+  .sheet-p{font-size:14px;color:var(--text-2);margin:10px 0 18px;line-height:1.5}
 
   /* Home + banner */
   .strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 20px}
@@ -117,20 +151,15 @@
 <body>
 <div class="wrap">
   <h1>Wiom CSP — Exit Flows <span style="font-weight:500;color:var(--text-hint);font-size:15px">· interactive</span></h1>
-  <p class="sub">Fully clickable prototype. In the phone: press the <b>CTA</b> → exit timeline; tap <b>काम की स्थिति देखें</b> (B1) → service status; tap the <b>home banner</b> → timeline. Toggle the flow to compare Voluntary / B1 / B2.</p>
+  <p class="sub">Fully clickable prototype. <b>Voluntary</b> = self-exit: start on <b>Home</b>, tap the <b>☰ hamburger</b> → <b>मेन्यू</b> → <b>Wiom छोड़ें</b> → consequences → confirm → timeline. <b>B1 / B2</b> = Wiom-initiated: a full-page notice → timeline. Toggle the flow to compare.</p>
 
   <div class="controls">
     <div class="seg flow" role="group" aria-label="Flow">
-      <button data-flow="vol" aria-pressed="false">Voluntary</button>
-      <button data-flow="b1" aria-pressed="true">B1 · Viability</button>
+      <button data-flow="vol" aria-pressed="true">Voluntary</button>
+      <button data-flow="b1" aria-pressed="false">B1 · Viability</button>
       <button data-flow="b2" aria-pressed="false">B2 · Integrity</button>
     </div>
-    <div class="seg scr" role="group" aria-label="Screen">
-      <button data-screen="first" aria-pressed="true">First screen</button>
-      <button data-screen="service">सेवा स्थिति</button>
-      <button data-screen="home">Home banner</button>
-      <button data-screen="timeline">Timeline</button>
-    </div>
+    <div class="seg scr" role="group" aria-label="Screen"></div>
   </div>
 
   <div class="stage">
@@ -183,10 +212,20 @@ const FLOWS = {
       {k:"up",  lab:"सेटलमेंट + डिवाइस वापसी",d:"23 – 30 जुलाई"},
       {k:"up",  lab:"प्रक्रिया पूरी",d:"30 जुलाई"} ] }
 };
-let flow="b1", screen="first";
+const SCREENS={
+  vol:[["vhome","Home"],["drawer","मेन्यू"],["first","Consequences"],["confirm","Confirm"],["timeline","Timeline"]],
+  b1:[["first","Full-page notice"],["service","सेवा स्थिति"],["home","Home banner"],["timeline","Timeline"]],
+  b2:[["first","Full-page notice"],["home","Home banner"],["timeline","Timeline"]],
+};
+let flow="vol", screen="vhome";
 const $=s=>document.querySelector(s);
 function nav(s){ screen=s; sync(); render(); }
-function sync(){ document.querySelectorAll('.seg.scr button').forEach(x=>x.setAttribute('aria-pressed', x.dataset.screen===screen)); }
+function renderTabs(){
+  const seg=document.querySelector('.seg.scr');
+  seg.innerHTML=SCREENS[flow].map(([k,l])=>`<button data-screen="${k}" aria-pressed="${k===screen}">${l}</button>`).join("");
+  seg.querySelectorAll('button').forEach(b=>b.onclick=()=>nav(b.dataset.screen));
+}
+function sync(){ renderTabs(); }
 
 function blocker(f){
   const link = f.statusLink ? `<div class="statuslink" onclick="nav('service')">अपने काम की स्थिति देखें ›</div>` : "";
@@ -205,14 +244,55 @@ function blocker(f){
     <div class="foot"><button class="cta" onclick="nav('timeline')">${f.cta}</button></div>`;
 }
 function consequences(f){
-  return `<div class="topbar"><span class="bk">‹</span><h2>Wiom छोड़ें</h2></div>
+  return `<div class="topbar"><span class="bk" onclick="nav('drawer')">‹</span><h2>Wiom छोड़ें</h2></div>
     <div class="body" style="padding-top:8px">
       <div class="headline" style="font-size:20px">${f.intro}</div>
       <div style="margin-top:18px">${f.consequences.map(c=>`<div class="wc-row"><span>${c}</span></div>`).join("")}</div>
       <div class="conseq-note">${f.note}</div>
       <div class="spacer"></div>
     </div>
-    <div class="foot"><button class="cta" onclick="nav('timeline')">${f.cta}</button></div>`;
+    <div class="foot"><button class="cta" onclick="nav('confirm')">${f.cta}</button></div>`;
+}
+function drItem(ic,lab){return `<div class="dr-item"><span class="di-ic">${ic}</span><span>${lab}</span></div>`;}
+function vhome(f){
+  return `<div class="topbar"><span class="ham" onclick="nav('drawer')">☰</span><h2>Rajesh Kumar · एडमिन</h2></div>
+    <div class="strip">
+      <div class="tile"><div class="k">कनेक्शन</div><div class="v">18<span style="color:var(--text-hint);font-size:13px">/45</span></div></div>
+      <div class="tile"><div class="k">सेवा स्थिति</div><div class="v" style="color:var(--state-positive);font-size:15px">✓ ठीक है</div></div>
+      <div class="tile"><div class="k">कमाई</div><div class="v">₹10,740</div></div>
+      <div class="tile"><div class="k">काम की स्थिति</div><div class="v" style="color:var(--state-positive)">✓</div></div>
+    </div>
+    <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>काम आने पर यहाँ दिखेगा</div></div>
+    <div class="tap-hint">बाहर निकलने के लिए ☰ मेन्यू → Wiom छोड़ें</div>`;
+}
+function drawer(f){
+  return `<div class="drawer-wrap">
+    <div class="drawer">
+      <div class="dr-head"><div class="dr-av">RK</div><div><div class="dr-name">Rajesh Kumar</div><div class="dr-role">एडमिन · CSP · Wiom</div></div></div>
+      <div class="dr-list">
+        ${drItem("👤","प्रोफ़ाइल")}
+        ${drItem("👛","वॉलेट")}
+        ${drItem("📦","NetBox")}
+        ${drItem("👥","मेरी टीम")}
+        ${drItem("🌐","भाषा")}
+        ${drItem("❓","मदद और सहायता")}
+      </div>
+      <div class="dr-exit" onclick="nav('first')"><span class="di-ic">🚪</span><span>Wiom छोड़ें</span><span class="cv">›</span></div>
+    </div>
+    <div class="dr-scrim" onclick="nav('vhome')"></div>
+  </div>`;
+}
+function confirm(f){
+  return `<div class="sheet-wrap">
+    <div class="sheet-scrim" onclick="nav('first')"></div>
+    <div class="sheet">
+      <div class="sheet-grab"></div>
+      <div class="sheet-h">क्या आप पक्का बाहर निकलना चाहते हैं?</div>
+      <div class="sheet-p">आपका अनुरोध दर्ज होगा और नोटिस अवधि शुरू हो जाएगी। माइग्रेशन शुरू होने से पहले तक आप इसे कभी भी रद्द कर सकते हैं।</div>
+      <button class="cta" onclick="nav('timeline')">हाँ, बाहर निकलें</button>
+      <button class="cta-ghost" onclick="nav('vhome')">रद्द करें</button>
+    </div>
+  </div>`;
 }
 function firstScreen(f){ return f.kind==="voluntary" ? consequences(f) : blocker(f); }
 function service(f){
@@ -252,35 +332,52 @@ function timeline(f){
       <div class="rail">${nodeEl(s.k)}${i===f.steps.length-1?"":'<div class="line"></div>'}</div>
       <div class="c"><div class="lab">${s.lab}${s.d?` <span class="d">· ${s.d}</span>`:""}</div>${s.aff?`<div class="aff">${s.aff}</div>`:""}</div></div>`).join("");
   const abort = f.abortable ? `<div class="abort"><div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div><div class="ab-d">माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं</div></div>` : "";
-  return `<div class="topbar"><span class="bk" onclick="nav('home')">‹</span><h2>बाहर निकलने की स्थिति</h2></div>
+  return `<div class="topbar"><span class="bk" onclick="nav('${flow==='vol'?'vhome':'home'}')">‹</span><h2>बाहर निकलने की स्थिति</h2></div>
     <div class="reason"><div class="eb">${f.reason}</div><div class="hl">${f.title}</div></div>
     <div class="tl-card" style="margin-top:16px"><div class="tl-h">आगे क्या होगा</div>${rows}</div>
     ${abort}`;
 }
 
+function renderScreen(f){
+  switch(screen){
+    case "vhome":   return vhome(f);
+    case "drawer":  return drawer(f);
+    case "confirm": return confirm(f);
+    case "service": return service(f);
+    case "home":    return home(f);
+    case "timeline":return timeline(f);
+    default:        return firstScreen(f);
+  }
+}
 function render(){
   const f=FLOWS[flow];
-  const scr = screen==="first"?firstScreen(f) : screen==="service"?service(f) : screen==="home"?home(f) : timeline(f);
-  $("#screen").innerHTML = scr;
-  document.querySelector('.seg.scr button[data-screen="first"]').textContent = f.kind==="voluntary" ? "Consequences" : "Full-page notice";
+  $("#screen").innerHTML = renderScreen(f);
   const d={
-    vol:"CSP-initiated · cancelable. Opt-in consequences → declare → abortable timeline.",
+    vol:"CSP-initiated · cancelable. <b>Home ☰ → मेन्यू → Wiom छोड़ें</b> → consequences → confirm sheet → abortable timeline.",
     b1:"Underperformance · no blame. Notice + a link to <b>काम की स्थिति</b> (why), then the exit timeline.",
-    b2:"Rule violation · final. Per the Exit-OS spec the <b>reason is NOT detailed in-app</b> — it's human-delivered, so the notice shows only a direct-contact line. <span class='tag'>spec: no evidence in-app</span>",
+    b2:"Rule violation · final. Reason is shown (Enforcement OS · FPV): the <b>violation type</b> + a direct-contact line to contest. <span class='tag'>FPV: reason in-app</span>",
+  };
+  const inter={
+    vol:`<p><b>☰ hamburger</b> (top-left) → opens the <b>menu drawer</b>.</p>
+      <p><b>Wiom छोड़ें</b> (drawer, red) → <b>consequences</b>.</p>
+      <p><b>आगे बढ़ें</b> → <b>confirm sheet</b> → <b>हाँ, बाहर निकलें</b> → timeline.</p>
+      <p><b>रद्द करें</b> / scrim → back to home. <b>‹ back</b> arrows navigate too.</p>`,
+    b1:`<p><b>CTA</b> → opens the <b>exit timeline</b>.</p>
+      <p><b>अपने काम की स्थिति देखें</b> → <b>service status</b> page.</p>
+      <p><b>Home banner</b> → exit timeline.</p>`,
+    b2:`<p><b>CTA</b> → opens the <b>exit timeline</b>.</p>
+      <p><b>Home banner</b> → exit timeline. <b>‹ back</b> arrows navigate too.</p>`,
   };
   $("#notes").innerHTML=`
     <h3>Interactions (click the phone)</h3>
-    <div class="box"><p><b>CTA</b> → opens the <b>exit timeline</b>.</p>
-      <p><b>अपने काम की स्थिति देखें</b> (B1) → <b>service status</b> page.</p>
-      <p><b>Home banner</b> → exit timeline. <b>‹ back</b> arrows navigate too.</p></div>
+    <div class="box">${inter[flow]}</div>
     <h3>Timeline styling</h3>
     <div class="box"><p><b style="color:var(--state-caution)">कारण-…</b> reason is <b>orange</b>; the heading &amp; dates are <b>black</b>.</p></div>
-    <h3>${flow==="vol"?"Voluntary":flow==="b2"?"B2 · Integrity":"B1 · Viability"}</h3>
+    <h3>${flow==="vol"?"Voluntary (self-exit)":flow==="b2"?"B2 · Integrity":"B1 · Viability"}</h3>
     <div class="box"><p>${d[flow]}</p></div>`;
 }
-document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow; screen="first";
+document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow; screen=SCREENS[flow][0][0];
   document.querySelectorAll(".seg.flow button").forEach(x=>x.setAttribute("aria-pressed",x===b)); sync(); render();});
-document.querySelectorAll(".seg.scr button").forEach(b=>b.onclick=()=>nav(b.dataset.screen));
 sync(); render();
 </script>
 </body>
