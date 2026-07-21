@@ -1,77 +1,199 @@
 <!doctype html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wiom CSP — Exit Flows (interactive)</title>
+<title>Exit OS — CSP App · Living Spec</title>
 <style>
+  /* ============================================================
+     Exit OS — living spec + prototype (CSP App)
+     App theme, sampled from device: cream #FBEED8 · maroon #642A2E
+     · rose-pink #DE1879 · brown ink #37261C.
+     ============================================================ */
   :root{
+    /* app tokens (from device) — used by the phone prototype */
     --brand:#DE1879; --brand-pressed:#B31060; --brand-tint:#FBE0EC;
-    --text-1:#37261C; --text-2:#736160; --text-hint:#A89A86; --text-on-warn:#4A3705;
     --maroon:#642A2E; --header-text:#FFF3DB;
+    --text-1:#37261C; --text-2:#736160; --text-hint:#A89A86; --text-on-warn:#4A3705;
     --bg-screen:#FBEED8; --bg-surface:#FFF6E1; --bg-neutral:#F4E8CF;
     --bg-warning:#FCE7A6; --bg-negative:#FBE0DE; --bg-positive:#DFF3E2;
     --state-positive:#1E7A44; --state-negative:#C0392B; --state-caution:#EA5E00;
-    --stroke-1:#ECDEC3; --stroke-2:#DBCBA9; --stroke-warn-focus:#FF8000;
-    --r-lg:16px; --r-md:12px;
+    --stroke-1:#ECDEC3; --stroke-2:#DBCBA9;
+    --r-lg:16px; --r-md:12px; --r-sm:8px;
+
+    /* document palette (light) — warm neutrals, pink spent sparingly */
+    --ground:#F4EBDA; --panel:#FFFDF7; --panel-2:#FBF3E4;
+    --ink:#37261C; --ink-2:#6E5D4A; --ink-3:#A18F78;
+    --line:#E7D8BE; --line-2:#EFE4CE;
+    --accent:#C4136E; --accent-soft:#FBE0EC; --code-bg:#F3EAD6;
+
+    --font-display:"Segoe UI",system-ui,-apple-system,sans-serif;
+    --font-body:system-ui,-apple-system,"Segoe UI",sans-serif;
+    --font-mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+    --font-deva:"Noto Sans Devanagari","Nirmala UI",system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(55,38,28,.05),0 8px 24px -12px rgba(55,38,28,.16);
+    --shadow-lift:0 2px 6px rgba(55,38,28,.08),0 18px 40px -18px rgba(100,42,46,.30);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:"Noto Sans","Segoe UI",system-ui,sans-serif;background:var(--bg-neutral);color:var(--text-1);
-    -webkit-font-smoothing:antialiased;padding:28px 16px 64px;line-height:1.45}
-  .wrap{max-width:1000px;margin:0 auto}
-  h1{font-size:22px;font-weight:800;letter-spacing:-.2px}
-  .sub{color:var(--text-2);font-size:14px;margin-top:6px;max-width:700px}
-  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 4px}
-  .seg{display:inline-flex;background:var(--bg-surface);border:1px solid var(--stroke-2);border-radius:999px;padding:4px;flex-wrap:wrap}
-  .seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:700;color:var(--text-2);
-    padding:8px 14px;border-radius:999px;cursor:pointer;transition:.15s}
-  .seg.flow button[aria-pressed="true"]{background:var(--text-1);color:#fff}
-  .seg.scr button[aria-pressed="true"]{background:var(--brand);color:#fff}
-  .hint{font-size:12px;color:var(--text-hint)}
-  .stage{display:grid;grid-template-columns:390px 1fr;gap:30px;margin-top:20px;align-items:start}
-  @media(max-width:820px){.stage{grid-template-columns:1fr}}
-  .phone{width:390px;max-width:100%;background:var(--bg-screen);border-radius:36px;border:1px solid var(--stroke-2);
-    box-shadow:0 20px 54px rgba(22,16,33,.15);overflow:hidden}
-  .sb{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:700}
-  .screen{min-height:720px;display:flex;flex-direction:column;position:relative}
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#1C1410; --panel:#261C16; --panel-2:#2E231B;
+      --ink:#F6ECDC; --ink-2:#C9B9A5; --ink-3:#8C7B67;
+      --line:#3A2C21; --line-2:#31251C;
+      --accent:#FF6FB0; --accent-soft:#3A121F; --code-bg:#2A2018;
+      --bg-screen:#241A14; --bg-surface:#2C211A; --bg-neutral:#33271E;
+      --text-1:#F6ECDC; --text-2:#C9B9A5; --text-hint:#8C7B67;
+      --stroke-1:#3A2C21; --stroke-2:#4A392C;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#1C1410; --panel:#261C16; --panel-2:#2E231B;
+    --ink:#F6ECDC; --ink-2:#C9B9A5; --ink-3:#8C7B67; --line:#3A2C21; --line-2:#31251C;
+    --accent:#FF6FB0; --accent-soft:#3A121F; --code-bg:#2A2018;
+    --bg-screen:#241A14; --bg-surface:#2C211A; --bg-neutral:#33271E;
+    --text-1:#F6ECDC; --text-2:#C9B9A5; --text-hint:#8C7B67; --stroke-1:#3A2C21; --stroke-2:#4A392C;
+  }
+  :root[data-theme="light"]{
+    --ground:#F4EBDA; --panel:#FFFDF7; --panel-2:#FBF3E4;
+    --ink:#37261C; --ink-2:#6E5D4A; --ink-3:#A18F78; --line:#E7D8BE; --line-2:#EFE4CE;
+    --accent:#C4136E; --accent-soft:#FBE0EC; --code-bg:#F3EAD6;
+    --bg-screen:#FBEED8; --bg-surface:#FFF6E1; --bg-neutral:#F4E8CF;
+    --text-1:#37261C; --text-2:#736160; --text-hint:#A89A86; --stroke-1:#ECDEC3; --stroke-2:#DBCBA9;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:var(--font-display);line-height:1.15;margin:0}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  code,.mono{font-family:var(--font-mono);font-size:.86em}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+  /* ---------- top bar ---------- */
+  header.top{position:sticky;top:0;z-index:50;background:var(--maroon);color:var(--header-text);border-bottom:1px solid rgba(255,255,255,.08)}
+  .top-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px;min-height:60px;flex-wrap:wrap}
+  .brand-mark{display:flex;align-items:baseline;gap:10px;font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-.01em;color:#fff}
+  .brand-mark .infi{color:var(--brand);font-size:20px}
+  .brand-mark small{font-weight:500;font-size:12px;color:#E7C9B4;letter-spacing:.02em}
+  nav.tabs{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+  nav.tabs button{appearance:none;border:0;background:transparent;cursor:pointer;color:#E7CFC0;font-family:var(--font-display);font-weight:650;font-size:13.5px;padding:8px 14px;border-radius:999px;transition:all .15s}
+  nav.tabs button:hover{color:#fff;background:rgba(255,255,255,.08)}
+  nav.tabs button[aria-selected="true"]{color:var(--maroon);background:#fff}
+  .theme-btn{appearance:none;border:1px solid rgba(255,255,255,.20);background:transparent;color:#F0DDCB;width:34px;height:34px;border-radius:999px;cursor:pointer;display:grid;place-items:center;font-size:15px}
+  .theme-btn:hover{background:rgba(255,255,255,.10)}
+
+  /* ---------- layout + doc components ---------- */
+  main{max-width:1200px;margin:0 auto;padding:34px 24px 90px}
+  .panel[hidden]{display:none}
+  .lede{max-width:70ch}
+  .eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:10px}
+  h2.section-h{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.02em}
+  h3.block-h{font-size:19px;font-weight:750;letter-spacing:-.01em;margin:42px 0 4px}
+  p{margin:10px 0;color:var(--ink-2)} p strong,li strong{color:var(--ink);font-weight:650}
+  .muted{color:var(--ink-3)}
+  hr.rule{border:0;border-top:1px solid var(--line);margin:44px 0}
+  .foot{color:var(--ink-3);font-size:12.5px;margin-top:44px;padding-top:20px;border-top:1px solid var(--line)}
+
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--panel);border-radius:0 var(--r-md) var(--r-md) 0;padding:16px 18px;margin:20px 0;box-shadow:var(--shadow)}
+  .callout.warn{border-left-color:var(--state-caution)}
+  .callout.crit{border-left-color:var(--state-negative)}
+  .callout.ok{border-left-color:var(--state-positive)}
+  .callout .tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--accent)}
+  .callout.warn .tag{color:var(--state-caution)} .callout.crit .tag{color:var(--state-negative)} .callout.ok .tag{color:var(--state-positive)}
+  .callout p{margin-top:8px}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+  @media (max-width:760px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  .figure{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow)}
+  .figure h4{font-size:15.5px;font-weight:700;margin-bottom:6px}
+  .figure p{font-size:13.5px;margin:6px 0 0}
+  .figure .big{font-size:30px;font-weight:800;color:var(--accent);letter-spacing:-.02em;font-family:var(--font-display)}
+
+  table{width:100%;border-collapse:collapse;margin:0;font-size:13.5px}
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-md);margin:18px 0}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  th{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;background:var(--panel-2)}
+  td{color:var(--ink-2)} td strong{color:var(--ink)}
+  tbody tr:last-child td{border-bottom:0}
+  td .mono{color:var(--accent)}
+  .deva{font-family:var(--font-deva)}
+
+  .pill{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .pill.ok{background:var(--bg-positive);color:var(--state-positive)}
+  .pill.warn{background:var(--bg-warning);color:var(--state-caution)}
+  .pill.crit{background:var(--bg-negative);color:var(--state-negative)}
+  .pill.info{background:var(--accent-soft);color:var(--accent)}
+  .pill.new{background:transparent;color:var(--accent);border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent)}
+
+  .kv{display:grid;grid-template-columns:max-content 1fr;gap:8px 18px;margin:16px 0;font-size:14px}
+  .kv dt{font-family:var(--font-mono);font-size:12.5px;color:var(--accent)}
+  .kv dd{margin:0;color:var(--ink-2)}
+
+  .steps{counter-reset:s;list-style:none;padding:0;margin:20px 0;display:flex;flex-direction:column;gap:12px}
+  .steps li{counter-increment:s;position:relative;padding-left:44px}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:999px;background:var(--accent);color:#fff;font-family:var(--font-display);font-weight:800;font-size:14px;display:grid;place-items:center}
+  .steps li strong{display:block;color:var(--ink)}
+
+  .fam-h{display:flex;align-items:center;gap:10px;margin:34px 0 8px}
+  .fam-h .ficon{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;background:var(--accent-soft);font-size:16px;flex:none}
+  .fam-h h4{font-size:16px;font-weight:750}
+  .fam-h .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3)}
+
+  /* ---------- prototype layout ---------- */
+  .proto-grid{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:28px;align-items:start;margin-top:24px}
+  @media (max-width:940px){.proto-grid{grid-template-columns:1fr}}
+  .phone-wrap{display:flex;justify-content:center}
+  .phone{width:390px;max-width:100%;background:#1c120e;border-radius:40px;padding:9px;box-shadow:var(--shadow-lift);position:sticky;top:84px;overflow:hidden}
+  .sb{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:700;background:var(--maroon);color:var(--header-text);border-radius:32px 32px 0 0}
+  .screen{height:720px;overflow-y:auto;display:flex;flex-direction:column;position:relative;background:var(--bg-screen);border-radius:0 0 32px 32px;font-family:var(--font-deva)}
+  .screen::-webkit-scrollbar{width:0}
+  .controls{display:flex;flex-direction:column;gap:16px;position:sticky;top:84px}
+  .ctl-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;box-shadow:var(--shadow)}
+  .ctl-card h4{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-family:var(--font-mono);font-weight:600;margin-bottom:12px}
+  .seg{display:flex;flex-wrap:wrap;gap:6px}
+  .seg button{appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);font-family:var(--font-body);font-size:12.5px;font-weight:600;padding:7px 11px;border-radius:999px;transition:all .14s}
+  .seg button:hover{border-color:var(--accent);color:var(--accent)}
+  .seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .notes h5{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-family:var(--font-mono);margin:0 0 6px}
+  .notes .box{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;margin-bottom:10px}
+  .notes .box p{font-size:12.5px;margin:4px 0;color:var(--ink-2)} .notes .box b{color:var(--ink)}
+  .inspector{background:var(--code-bg);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+  .inspector .ttl{padding:11px 14px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line)}
+  .inspector pre{margin:0;padding:12px 14px;font-family:var(--font-mono);font-size:11.5px;line-height:1.65;color:var(--ink-2);overflow-x:auto;max-height:260px}
+  .inspector .k{color:var(--accent)} .inspector .s{color:var(--state-positive)} .inspector .b{color:var(--state-caution)}
+  .tag{font-family:var(--font-mono);font-size:10.5px;background:var(--accent-soft);color:var(--accent);padding:2px 7px;border-radius:999px}
+
+  /* ---------- phone screen components (match app) ---------- */
   .body{flex:1;padding:0 22px;display:flex;flex-direction:column}
   .topbar{display:flex;align-items:center;gap:14px;padding:14px 20px 16px;background:var(--maroon)}
   .topbar .bk{font-size:20px;color:var(--header-text);cursor:pointer}
   .topbar h2{font-size:16px;font-weight:700;color:var(--header-text)}
-
-  /* Blocker (notice) */
   .notice-kicker{font-size:16px;font-weight:800;color:var(--state-negative);letter-spacing:.4px}
   .notice-rule{height:2px;background:var(--state-negative);margin:8px 0 18px}
   .headline{font-size:24px;font-weight:800;line-height:1.32;color:var(--text-1)}
   .lead{font-size:16px;color:var(--text-2);margin-top:14px;line-height:1.5}
-  .statuslink{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:16px;font-weight:400;
-    line-height:24px;color:var(--brand);cursor:pointer;padding:8px 0}
+  .statuslink{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:16px;font-weight:400;line-height:24px;color:var(--brand);cursor:pointer;padding:8px 0}
   .statuslink:active{opacity:.6}
+  .v-reason{margin-top:16px;background:var(--bg-negative);border-radius:var(--r-md);padding:12px 14px}
+  .v-reason .h{font-size:13px;font-weight:800;color:var(--state-negative)}
+  .v-reason .r{font-size:14px;color:var(--text-1);padding:4px 0 0}
+  .contact-note{margin-top:16px;font-size:14px;color:var(--text-2);line-height:1.5}
   .wc-label{font-size:14px;font-weight:700;color:var(--text-hint);margin-top:30px}
   .wc-row{display:flex;align-items:center;gap:14px;padding:9px 0}
   .wc-dot{width:5px;height:5px;border-radius:50%;flex:none;background:var(--text-2)}
   .wc-row span{font-size:16px;color:var(--text-1)}
   .conseq-note{font-size:13px;color:var(--text-2);margin-top:20px;padding:12px 14px;background:var(--bg-neutral);border-radius:var(--r-md);line-height:1.45}
-  .v-reason{margin-top:16px;background:var(--bg-negative);border-radius:var(--r-md);padding:12px 14px}
-  .v-reason .h{font-size:13px;font-weight:800;color:var(--state-negative)}
-  .v-reason .r{font-size:14px;color:var(--text-1);padding:4px 0 0}
-  .contact-note{margin-top:16px;font-size:14px;color:var(--text-2);line-height:1.5}
   .spacer{flex:1;min-height:20px}
-  .foot{padding:16px 22px 22px}
-  .cta{display:block;width:100%;text-align:center;font-size:16px;font-weight:800;border:0;cursor:pointer;
-    padding:16px;border-radius:var(--r-md);background:var(--brand);color:#fff}
+  .foot-cta{padding:16px 22px 22px}
+  .cta{display:block;width:100%;text-align:center;font-size:16px;font-weight:800;border:0;cursor:pointer;padding:16px;border-radius:var(--r-md);background:var(--brand);color:#fff}
   .cta:active{background:var(--brand-pressed)}
-  .cta-ghost{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;border:0;cursor:pointer;
-    padding:14px;border-radius:var(--r-md);background:transparent;color:var(--text-2);margin-top:6px}
-  .cta-ghost:active{background:var(--bg-neutral)}
+  .cta-ghost{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;border:0;cursor:pointer;padding:14px;border-radius:var(--r-md);background:transparent;color:var(--text-2);margin-top:6px}
   .ham{font-size:22px;color:var(--header-text);cursor:pointer;line-height:1;padding:2px 4px}
-  .tap-hint{margin:20px 22px 0;font-size:12.5px;font-weight:700;color:var(--brand);background:var(--brand-tint);
-    border-radius:999px;padding:9px 14px;text-align:center}
-
-  /* Hamburger drawer (matches app: maroon header + cream body + icon/label/chevron) */
+  .tap-hint{margin:20px 22px 0;font-size:12.5px;font-weight:700;color:var(--brand);background:var(--brand-tint);border-radius:999px;padding:9px 14px;text-align:center}
   .drawer-wrap{position:absolute;inset:0;display:flex;z-index:5}
-  .drawer{width:78%;max-width:320px;background:var(--bg-surface);display:flex;flex-direction:column;
-    box-shadow:2px 0 30px rgba(30,15,10,.30);animation:slideIn .18s ease}
+  .drawer{width:78%;max-width:320px;background:var(--bg-surface);display:flex;flex-direction:column;box-shadow:2px 0 30px rgba(30,15,10,.30);animation:slideIn .18s ease}
   @keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
   .dr-scrim{flex:1;background:rgba(30,15,10,.45);cursor:pointer}
   .dr-head{background:var(--maroon);color:var(--header-text);padding:46px 22px 22px}
@@ -80,107 +202,310 @@
   .dr-body{flex:1;display:flex;flex-direction:column;padding:8px 0;overflow:auto}
   .dr-item{display:flex;align-items:center;gap:16px;padding:16px 22px;cursor:pointer}
   .dr-item:hover{background:var(--bg-neutral)}
-  .di-ic{font-size:20px;width:24px;text-align:center;flex:none}
-  .di-lab{font-size:16px;font-weight:600;color:var(--text-1);flex:1}
-  .di-cv{color:var(--text-hint);font-size:18px;flex:none}
-  .dr-div{height:1px;background:var(--stroke-1);margin:8px 22px}
-  .dr-spacer{flex:1;min-height:20px}
-  /* Settings screen list */
+  .di-ic{font-size:20px;width:24px;text-align:center;flex:none} .di-lab{font-size:16px;font-weight:600;color:var(--text-1);flex:1} .di-cv{color:var(--text-hint);font-size:18px;flex:none}
+  .dr-div{height:1px;background:var(--stroke-1);margin:8px 22px} .dr-spacer{flex:1;min-height:20px}
   .st-list{flex:1;overflow:auto;display:flex;flex-direction:column;background:var(--bg-screen)}
   .st-profile{display:flex;align-items:center;gap:14px;padding:20px 22px;border-bottom:1px solid var(--stroke-1)}
-  .dr-av{width:46px;height:46px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;
-    display:grid;place-items:center;font-size:16px;flex:none}
+  .dr-av{width:46px;height:46px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;display:grid;place-items:center;font-size:16px;flex:none}
   .dr-name{font-size:16px;font-weight:800;color:var(--text-1)} .dr-role{font-size:12.5px;color:var(--text-2);margin-top:2px}
   .st-sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--text-hint);padding:20px 22px 4px}
-
-  /* Confirm bottom-sheet */
   .sheet-wrap{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;z-index:6}
-  .sheet-scrim{position:absolute;inset:0;background:rgba(22,16,33,.42);cursor:pointer}
-  .sheet{position:relative;background:var(--bg-surface);border-radius:22px 22px 0 0;padding:10px 22px 24px;
-    animation:sheetUp .2s ease}
+  .sheet-scrim{position:absolute;inset:0;background:rgba(30,15,10,.45);cursor:pointer}
+  .sheet{position:relative;background:var(--bg-surface);border-radius:22px 22px 0 0;padding:10px 22px 24px;animation:sheetUp .2s ease}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   .sheet-grab{width:40px;height:4px;border-radius:99px;background:var(--stroke-2);margin:4px auto 16px}
-  .sheet-h{font-size:19px;font-weight:800;line-height:1.35}
+  .sheet-h{font-size:19px;font-weight:800;line-height:1.35;color:var(--text-1)}
   .sheet-p{font-size:14px;color:var(--text-2);margin:10px 0 18px;line-height:1.5}
-
-  /* Home + banner */
   .strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 20px}
   .tile{background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:13px 14px}
-  .tile .k{font-size:12px;color:var(--text-2)} .tile .v{font-size:18px;font-weight:800;margin-top:3px}
-  .banner{margin:8px 20px;border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;align-items:center;
-    background:var(--bg-warning);cursor:pointer;transition:filter .15s, transform .06s}
-  .banner:hover{filter:brightness(.97)} .banner:active{transform:scale(.99)}
+  .tile .k{font-size:12px;color:var(--text-2)} .tile .v{font-size:18px;font-weight:800;margin-top:3px;color:var(--text-1)}
+  .banner{margin:8px 20px;border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;align-items:center;background:var(--bg-warning);cursor:pointer;transition:filter .15s,transform .06s}
+  .banner:hover{filter:brightness(.98)} .banner:active{transform:scale(.99)}
   .banner .ic{font-size:16px;line-height:1.2}
   .banner .t{font-size:11px;font-weight:700;color:var(--text-on-warn);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .banner .s{font-size:12px;font-weight:700;color:var(--text-on-warn);margin-top:4px}
   .banner .cv{margin-left:auto;color:var(--text-on-warn);opacity:.55;font-size:18px}
-  .empty{text-align:center;color:var(--text-2);margin-top:60px}
-  .empty .h{font-size:16px;font-weight:700;color:var(--text-1)}
-
-  /* Service status (काम की स्थिति) */
+  .empty{text-align:center;color:var(--text-2);margin-top:60px} .empty .h{font-size:16px;font-weight:700;color:var(--text-1)}
   .ss-state{margin:8px 22px 0;background:var(--bg-warning);border-radius:var(--r-md);padding:12px 14px;font-size:14px;font-weight:700;color:var(--text-on-warn);display:flex;gap:8px;align-items:center}
   .ss-secl{margin:16px 22px 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-hint)}
   .ss-card{margin:8px 22px 0;background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:2px 16px}
-  .ss-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--stroke-1);gap:12px}
-  .ss-row:last-child{border-bottom:0}
-  .ss-row .lbl{font-size:14px;font-weight:600;color:var(--text-1)}
-  .ss-row .sub{font-size:12px;color:var(--text-hint);margin-top:2px}
-  .ss-row .val{font-size:17px;font-weight:800;flex:none}
+  .ss-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--stroke-1);gap:12px} .ss-row:last-child{border-bottom:0}
+  .ss-row .lbl{font-size:14px;font-weight:600;color:var(--text-1)} .ss-row .sub{font-size:12px;color:var(--text-hint);margin-top:2px} .ss-row .val{font-size:17px;font-weight:800;flex:none}
   .ss-note{margin:18px 22px;font-size:13.5px;color:var(--state-caution);font-weight:600}
-
-  /* Timeline */
   .reason{padding:14px 22px 0}
-  .reason .eb{font-size:13px;font-weight:800;color:var(--state-caution)}   /* reason — ORANGE */
-  .reason .hl{font-size:20px;font-weight:800;margin-top:5px;color:var(--text-1)}  /* heading — BLACK */
-  .tl-anchor{font-size:15px;color:var(--text-1);font-weight:700;padding:0 22px;margin-top:4px}  /* date — BLACK */
+  .reason .eb{font-size:13px;font-weight:800;color:var(--state-caution)}
+  .reason .hl{font-size:20px;font-weight:800;margin-top:5px;color:var(--text-1)}
+  .tl-anchor{font-size:15px;color:var(--text-1);font-weight:700;padding:0 22px;margin-top:4px}
   .tl-card{margin:16px 22px;background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-lg);padding:18px}
-  .tl-h{font-size:16px;font-weight:800;margin-bottom:14px}
+  .tl-h{font-size:16px;font-weight:800;margin-bottom:14px;color:var(--text-1)}
   .step{display:flex;gap:13px}
   .rail{display:flex;flex-direction:column;align-items:center}
   .nd{width:14px;height:14px;border-radius:50%;margin-top:2px;flex:none;display:grid;place-items:center;font-size:10px;color:#fff}
   .line{width:2px;flex:1;background:var(--stroke-2);min-height:30px}
   .step .c{padding-bottom:18px}
-  .step .lab{font-size:15px;font-weight:700;color:var(--text-1)}
-  .step .lab .d{font-weight:500;color:var(--text-1);font-size:13px}   /* dates — BLACK */
+  .step .lab{font-size:15px;font-weight:700;color:var(--text-1)} .step .lab .d{font-weight:500;color:var(--text-1);font-size:13px}
   .step .aff{font-size:13px;color:var(--text-2);margin-top:2px}
-  .step.up .lab{color:var(--text-hint);font-weight:500}
-  .step.up .lab .d{color:var(--text-hint)}
+  .step.up .lab{color:var(--text-hint);font-weight:500} .step.up .lab .d{color:var(--text-hint)}
   .abort{margin:0 22px 16px;background:var(--bg-warning);border-radius:var(--r-md);padding:14px 16px}
   .abort .ab-h{font-size:14px;font-weight:700;color:var(--text-on-warn)}
   .abort .ab-d{font-size:12.5px;color:var(--text-on-warn);opacity:.85;margin-top:4px}
   .abort .ab-pnr{font-size:12.5px;font-weight:700;color:var(--state-caution);margin-top:6px}
-  .cta-outline{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;cursor:pointer;
-    padding:13px;border-radius:var(--r-md);background:#fff;color:var(--brand);
-    border:1.5px solid var(--brand);margin-top:14px}
-  .cta-outline:active{background:var(--brand-tint)}
-
-  .notes h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-hint);margin:2px 0 8px}
-  .notes .box{background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:16px;margin-bottom:12px}
-  .notes p{font-size:13.5px;color:var(--text-2);margin:5px 0} .notes b{color:var(--text-1)}
-  .tag{display:inline-block;font-size:11px;font-weight:700;background:var(--brand-tint);color:var(--brand);padding:2px 8px;border-radius:999px}
+  .cta-outline{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;cursor:pointer;padding:13px;border-radius:var(--r-md);background:#fff;color:var(--brand);border:1.5px solid var(--brand);margin-top:14px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Wiom CSP — Exit Flows <span style="font-weight:500;color:var(--text-hint);font-size:15px">· interactive</span></h1>
-  <p class="sub">Fully clickable prototype. <b>Voluntary</b> = self-exit: start on <b>Home</b>, tap the <b>☰ hamburger</b> → <b>सेटिंग्स</b> → खाता → <b>Wiom के साथ काम बंद करें</b> → consequences → confirm → timeline. <b>B1 / B2</b> = Wiom-initiated: a full-page notice → timeline. Toggle the flow to compare.</p>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mark"><span class="infi">∞</span> Exit&nbsp;OS <small>Ending a partnership · CSP&nbsp;App</small></div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" aria-selected="true"  data-tab="proto">Prototype</button>
+      <button role="tab" aria-selected="false" data-tab="design">Design</button>
+      <button role="tab" aria-selected="false" data-tab="tech">Tech</button>
+      <button role="tab" aria-selected="false" data-tab="product">Product</button>
+    </nav>
+    <button class="theme-btn" id="themeToggle" aria-label="Toggle light / dark">◑</button>
+  </div>
+</header>
 
-  <div class="controls">
-    <div class="seg flow" role="group" aria-label="Flow">
-      <button data-flow="vol" aria-pressed="true">Voluntary</button>
-      <button data-flow="b1" aria-pressed="false">B1 · Viability</button>
-      <button data-flow="b2" aria-pressed="false">B2 · Integrity</button>
+<main>
+
+<!-- ============================ PROTOTYPE ============================ -->
+<section class="panel" id="proto" role="tabpanel">
+  <div class="eyebrow">Living prototype · matches the shipped app</div>
+  <h2 class="section-h">Three ways a partnership ends — live.</h2>
+  <p class="lede">Every screen below is rendered from the same tokens, copy and state the CSP app ships — cream <span class="mono">#FBEED8</span>, maroon <span class="mono">#642A2E</span>, rose-pink <span class="mono">#DE1879</span>. Pick a flow, then tap through the phone. <strong>Voluntary</strong> starts on Home → ☰ → सेटिंग्स → खाता. <strong>B1</strong> and <strong>B2</strong> are Wiom-initiated — a full-page notice on app open, then the timeline. The inspector shows the exact <span class="mono">GET /exit/status</span> payload behind the current screen.</p>
+
+  <div class="proto-grid">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="sb"><span>9:41</span><span>▲ ⋯ 🔋</span></div>
+        <div class="screen" id="screen"></div>
+      </div>
     </div>
-    <div class="seg scr" role="group" aria-label="Screen"></div>
+    <div class="controls">
+      <div class="ctl-card">
+        <h4>Flow</h4>
+        <div class="seg flow" role="group" aria-label="Flow">
+          <button data-flow="vol" aria-pressed="true">Voluntary</button>
+          <button data-flow="b1" aria-pressed="false">B1 · Viability</button>
+          <button data-flow="b2" aria-pressed="false">B2 · Integrity</button>
+        </div>
+        <h4 style="margin-top:16px">Screen</h4>
+        <div class="seg scr" role="group" aria-label="Screen"></div>
+      </div>
+      <div class="inspector">
+        <div class="ttl">◦ current screen — from GET /exit/status</div>
+        <pre id="wire"></pre>
+      </div>
+      <div class="notes" id="notes"></div>
+    </div>
   </div>
 
-  <div class="stage">
-    <div class="phone"><div class="sb"><span>9:41</span><span>▲ ⋯ 🔋</span></div><div class="screen" id="screen"></div></div>
-    <div class="notes" id="notes"></div>
+  <hr class="rule">
+  <h3 class="block-h">The three exits, at a glance</h3>
+  <p>One state machine (S0–S6), three entry classes. Who pulls the trigger decides everything downstream — the first surface, whether the reason is shown, and whether the CSP can still turn back.</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Class</th><th>Initiated by</th><th>First surface</th><th>Reason shown?</th><th>Reversible?</th><th>Tone</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Voluntary</strong><br><span class="muted">self-exit</span></td><td>The CSP</td><td>Settings → खाता → opt-in consequences</td><td><span class="pill ok">n/a — their choice</span></td><td><span class="pill ok">Yes · until migration (S4)</span></td><td>Dignified, calm</td></tr>
+      <tr><td><strong>B1 · Viability</strong><br><span class="muted">underperformance</span></td><td>Wiom</td><td>Full-page blocker on app open</td><td><span class="pill warn">Yes · performance, no blame</span></td><td><span class="pill crit">No</span></td><td>Factual, no shame</td></tr>
+      <tr><td><strong>B2 · Integrity</strong><br><span class="muted">rule violation</span></td><td>Wiom</td><td>Full-page blocker on app open</td><td><span class="pill crit">Yes · the FPV type</span></td><td><span class="pill crit">No</span></td><td>Firm, plain, contestable</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================ DESIGN ============================ -->
+<section class="panel" id="design" role="tabpanel" hidden>
+  <div class="eyebrow">Design rationale</div>
+  <h2 class="section-h">Ending well is a design problem.</h2>
+  <p class="lede">A CSP leaving Wiom is a person losing a livelihood relationship. The design job is to make the ending <strong>legible, dignified, and honest</strong> — the CSP always knows where they stand, why, and what happens to their money and devices. Three principles do the heavy lifting.</p>
+
+  <div class="grid-3">
+    <div class="figure"><div class="big">Blocker</div><h4>Wiom-initiated = full-page</h4><p>The CSP never opted in, so B1/B2 open as a full-page <strong>Notice</strong> (सूचना) — a red kicker + rule, one bold statement, one action. It cannot be dismissed into the feed.</p></div>
+    <div class="figure"><div class="big">Opt-in</div><h4>Voluntary = consequences first</h4><p>A self-exit is a legitimate choice. It lives quietly in Settings, opens a <strong>double opt-in</strong> (read consequences → explicit second confirm), and stays cancellable.</p></div>
+    <div class="figure"><div class="big">One line</div><h4>Reason in one honest line</h4><p>The <span class="deva">कारण-…</span> line is orange; the decision headline and dates are black. No walls of text — the CSP reads the why in a glance.</p></div>
   </div>
-</div>
+
+  <div class="callout crit">
+    <div class="tag">Disclosure ceiling — Exit OS §07</div>
+    <p>The app shows <strong>state + timeline</strong>, never the internal risk classification. B1 says the work stayed below target and links to <span class="deva">सेवा स्थिति</span> so the CSP can see the metric themselves — it never exposes scores, rankings, or the model that flagged them.</p>
+  </div>
+
+  <div class="callout warn">
+    <div class="tag">FPV / Enforcement OS — the B2 exception</div>
+    <p>For integrity exits the <strong>Enforcement OS · FPV note (13 Jul 2026)</strong> overrides the ceiling: the CSP is shown the <strong>actual violation type</strong> so the decision isn't arbitrary and can be contested. Types: <strong>Disintermediation</strong>, <strong>Extra Cash</strong> (out-of-system payment — <span class="deva">ग्राहक से तय कीमत से ज़्यादा पैसे लिए गए</span>), <strong>Device Lost / Theft / Damage</strong>. A human still walks them through it — the note stays.</p>
+  </div>
+
+  <h3 class="block-h">Copy deck — B1 · Viability</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Slot</th><th>Copy (hi)</th></tr></thead>
+    <tbody>
+      <tr><td>Notice kicker</td><td class="deva">सूचना</td></tr>
+      <tr><td>Headline</td><td class="deva">Wiom के साथ आपका काम अब बंद किया जा रहा है।</td></tr>
+      <tr><td>Body</td><td class="deva">पिछले 2-3 महीने से आपका काम टारगेट से नीचे रहा।</td></tr>
+      <tr><td>Status link</td><td class="deva">अपने काम की स्थिति देखें ›</td></tr>
+      <tr><td>Timeline reason</td><td class="deva">कारण- काम हमेशा टारगेट से नीचे रहा <span class="pill warn">orange</span></td></tr>
+      <tr><td>Anchor</td><td class="deva">प्रक्रिया 16 जुलाई 2026 से शुरू</td></tr>
+      <tr><td>CTA</td><td class="deva">ठीक है, समझ गया</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="block-h">Copy deck — B2 · Integrity</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Slot</th><th>Copy (hi)</th></tr></thead>
+    <tbody>
+      <tr><td>Headline</td><td class="deva">Wiom के साथ आपका काम अब बंद किया जा रहा है।</td></tr>
+      <tr><td>Body</td><td class="deva">नियम तोड़ने के कारण यह फ़ैसला लिया गया है।</td></tr>
+      <tr><td>कारण (FPV)</td><td class="deva">अतिरिक्त कैश — ग्राहक से तय कीमत से ज़्यादा पैसे लिए गए</td></tr>
+      <tr><td>Contact note</td><td class="deva">🤝 इस बारे में हमारी टीम सीधे आपसे बात करके बताएगी।</td></tr>
+      <tr><td>Timeline reason</td><td class="deva">कारण- ग्राहक से तय कीमत से ज़्यादा पैसे लिए गए <span class="pill warn">orange</span></td></tr>
+      <tr><td>CTA</td><td class="deva">मैं समझ गया</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="block-h">Copy deck — Voluntary</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Slot</th><th>Copy (hi)</th></tr></thead>
+    <tbody>
+      <tr><td>Menu entry</td><td class="deva">Wiom के साथ काम बंद करें <span class="pill crit">red row · खाता</span></td></tr>
+      <tr><td>Consequences intro</td><td class="deva">बाहर निकलने से पहले समझ लें कि क्या-क्या बदलेगा:</td></tr>
+      <tr><td>Confirm sheet</td><td class="deva">क्या आप पक्का बाहर निकलना चाहते हैं? · हाँ, बाहर निकलें / रद्द करें</td></tr>
+      <tr><td>Timeline reason</td><td class="deva">आपने खुद बाहर निकलने का फैसला किया है</td></tr>
+      <tr><td>Timeline headline</td><td class="deva">बाहर निकलने का अनुरोध दर्ज हो गया</td></tr>
+      <tr><td>Abort card</td><td class="deva">अभी भी अपना निर्णय बदल सकते हैं · अनुरोध वापस लें</td></tr>
+      <tr><td>Point-of-no-return</td><td class="deva">एक बार ग्राहक माइग्रेशन शुरू हुआ तो रद्द नहीं कर पाएंगे</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="block-h">"What changes" — shown on every Wiom-initiated notice</h3>
+  <ul class="steps">
+    <li><strong class="deva">अब आपको नए काम या कनेक्शन नहीं मिलेंगे</strong>Routing stops — no fresh work is assigned.</li>
+    <li><strong class="deva">आपके चालू काम अब Wiom का सिस्टम संभालेगा</strong>In-flight work is taken over by Wiom.</li>
+    <li><strong class="deva">आपका पैसा सेटल होगा और डिवाइस वापस होंगे</strong>Wallet settles, devices are returned.</li>
+  </ul>
+</section>
+
+<!-- ============================ TECH ============================ -->
+<section class="panel" id="tech" role="tabpanel" hidden>
+  <div class="eyebrow">Implementation</div>
+  <h2 class="section-h">One endpoint, one model, seven states.</h2>
+  <p class="lede">The app never decides an exit — it renders <span class="mono">GET /exit/status</span>. The banner arrives on a separate <span class="mono">/feed/banners</span> channel and deep-links in. Everything below is server-rendered; the client composes nothing.</p>
+
+  <h3 class="block-h">Data model — <span class="mono">ExitStatusData</span></h3>
+  <dl class="kv">
+    <dt>exit_class</dt><dd><span class="mono">VOLUNTARY | B1_VIABILITY | B2_INTEGRITY</span> — drives which surface renders.</dd>
+    <dt>current_state</dt><dd>S0–S6 machine position (see below).</dd>
+    <dt>class_display</dt><dd>The orange <span class="deva">कारण-…</span> reason line.</dd>
+    <dt>headline_display</dt><dd>The black decision headline.</dd>
+    <dt>blocker_body_display</dt><dd>Body line under the headline on the blocker.</dd>
+    <dt>timeline_display</dt><dd>The black anchor line under the heading (e.g. <span class="deva">प्रक्रिया 16 जुलाई 2026 से शुरू</span>).</dd>
+    <dt>what_changes[]</dt><dd>The monochrome consequence list.</dd>
+    <dt>violations[]</dt><dd>B2 FPV reason lines (type + case anchor).</dd>
+    <dt>steps[]</dt><dd><span class="mono">{state, label_display, status, timer_display, affects_display}</span></dd>
+    <dt>abortable</dt><dd><span class="mono">true</span> for Voluntary only; abort CTA + point-of-no-return render.</dd>
+    <dt>abort_deadline_display<br>point_of_no_return_note</dt><dd>Server-composed abort window + the S4 last-chance signal.</dd>
+  </dl>
+
+  <h3 class="block-h">Mock states — <span class="mono">exitState</span> key</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>exitState</th><th>Fixture</th><th>Class</th><th>Renders</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">(default)</span></td><td><span class="mono">status.json</span></td><td>VOLUNTARY · NOTICE</td><td>Notice-period timeline</td></tr>
+      <tr><td><span class="mono">declared</span></td><td><span class="mono">status__declared.json</span></td><td>VOLUNTARY</td><td>Declared · abortable timeline</td></tr>
+      <tr><td><span class="mono">b1</span></td><td><span class="mono">status__b1.json</span></td><td>B1_VIABILITY</td><td>Blocker + timeline</td></tr>
+      <tr><td><span class="mono">b2</span></td><td><span class="mono">status__b2.json</span></td><td>B2_INTEGRITY</td><td>Blocker (FPV reason) + timeline</td></tr>
+      <tr><td><span class="mono">routing_restricted<br>execution · offboarding · complete</span></td><td><span class="mono">status__*.json</span></td><td>—</td><td>S3–S6 progression</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="block-h">Endpoints</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Call</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">GET /exit/status</span></td><td>Keyed on <span class="mono">exitState</span> → the fixture above.</td></tr>
+      <tr><td><span class="mono">POST /exit/declare</span></td><td>Sets <span class="mono">exitState=declared</span> + <span class="mono">taskFeedComposition=exit_active</span> → home banner appears.</td></tr>
+      <tr><td><span class="mono">POST /exit/abort</span></td><td>Clears both keys → banner disappears, back to normal home.</td></tr>
+      <tr><td><span class="mono">GET /feed/banners</span></td><td>Serves <span class="mono">banners__exit_active.json</span>; <strong>overrides</strong> the feed banner. This is what puts the exit banner on Home.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="block-h">Navigation &amp; deep-link</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Route</th><th>From</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">exit_initiate</span></td><td>Settings → खाता → <span class="deva">Wiom के साथ काम बंद करें</span> (voluntary double opt-in).</td></tr>
+      <tr><td><span class="mono">exit_status</span></td><td>Home banner <span class="mono">deep_link=exit_status</span> → DeepLinkRouter → safeNavigate.</td></tr>
+      <tr><td><span class="mono">exit_blocker/{cls}</span></td><td>Wiom-initiated full-page notice (B1/B2), shown on app open.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="block-h">State machine — S0 → S6</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>State</th><th>Meaning</th><th>What changes</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">S0</span></td><td>Active</td><td class="deva">काम आ रहा है</td></tr>
+      <tr><td><span class="mono">S1</span></td><td>Declared / process started</td><td class="deva">यहीं से समयसीमा शुरू</td></tr>
+      <tr><td><span class="mono">S2</span></td><td>Notice period</td><td class="deva">रूटिंग और दिखावट जारी</td></tr>
+      <tr><td><span class="mono">S3</span></td><td>Routing restricted</td><td class="deva">नए कनेक्शन बंद</td></tr>
+      <tr><td><span class="mono">S4</span></td><td>Customer migration <span class="pill crit">point of no return</span></td><td class="deva">ग्राहक दूसरे पार्टनर को · वापसी संभव नहीं</td></tr>
+      <tr><td><span class="mono">S5</span></td><td>Final settlement</td><td class="deva">वॉलेट सेटलमेंट + डिवाइस वापसी</td></tr>
+      <tr><td><span class="mono">S6</span></td><td>Complete</td><td class="deva">प्रक्रिया पूरी</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================ PRODUCT ============================ -->
+<section class="panel" id="product" role="tabpanel" hidden>
+  <div class="eyebrow">Product intent</div>
+  <h2 class="section-h">Why this exists.</h2>
+  <dl class="kv">
+    <dt>WHY</dt><dd>A partnership ending — by either side — must be clear and dignified, not a silent shutdown. The CSP always knows where they stand, why, and what happens to their money and devices.</dd>
+    <dt>WHO</dt><dd>Channel Service Partners (CSPs). Voluntary = the CSP choosing to leave. B1/B2 = Wiom ending the relationship.</dd>
+    <dt>WHAT (success)</dt><dd>The CSP reaches settlement + device return with zero surprise: no un-explained loss of work, no disputed money, no "why was I removed?" support ticket.</dd>
+  </dl>
+
+  <h3 class="block-h">What happens to pending work at exit</h3>
+  <p>The most common CSP fear: "I have live installs, services and recharges — what happens to them?" The answer is the same across all three classes — <strong>no work is orphaned</strong>.</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Work type</th><th>On exit</th><th>Who finishes it</th></tr></thead>
+    <tbody>
+      <tr><td><strong>New / unassigned</strong></td><td>Routing stops — none is created for the exiting CSP.</td><td>—</td></tr>
+      <tr><td><strong>In-flight install</strong></td><td>Near-complete jobs may finish within the notice window; the rest are taken over.</td><td class="deva">Wiom का सिस्टम</td></tr>
+      <tr><td><strong>Open service / restore</strong></td><td>Handed to Wiom's system; the customer never sees a gap.</td><td class="deva">Wiom टीम</td></tr>
+      <tr><td><strong>Pending recharge</strong></td><td>Settled; commission reconciled into the final settlement.</td><td>Settlement (S5)</td></tr>
+      <tr><td><strong>Customers</strong></td><td>Migrated to another partner during S4 — irreversible once started.</td><td>Wiom</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout ok">
+    <div class="tag">The promise, in the CSP's words</div>
+    <p class="deva">आपके चालू काम अब Wiom का सिस्टम संभालेगा। आपका पैसा सेटल होगा और डिवाइस वापस होंगे।</p>
+  </div>
+
+  <h3 class="block-h">Timeline windows</h3>
+  <div class="grid-2">
+    <div class="figure"><h4>Voluntary · ~6 weeks</h4><p class="deva">16 जुलाई declare → 16–30 जुलाई नोटिस → 30 जुलाई–2 अगस्त काम बंद → 2–23 अगस्त ग्राहक माइग्रेशन → 23–30 अगस्त सेटलमेंट → 30 अगस्त पूरा</p><p class="muted">Longer, gentler — the CSP chose this, and can still turn back until migration.</p></div>
+    <div class="figure"><h4>B1 / B2 · ~2 weeks</h4><p class="deva">16 जुलाई शुरू → काम तुरंत बंद → 23–30 जुलाई सेटलमेंट → 30 जुलाई पूरा</p><p class="muted">Faster — Wiom initiated, work stops immediately, no notice period.</p></div>
+  </div>
+
+  <h3 class="block-h">Reversibility policy</h3>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Class</th><th>Can withdraw?</th><th>Until when</th></tr></thead>
+    <tbody>
+      <tr><td>Voluntary</td><td><span class="pill ok">Yes</span></td><td>Until customer migration (S4) begins — <span class="deva">अनुरोध वापस लें</span>.</td></tr>
+      <tr><td>B1 · Viability</td><td><span class="pill crit">No</span></td><td>Decision is final; the CSP can review the metric that drove it.</td></tr>
+      <tr><td>B2 · Integrity</td><td><span class="pill crit">No</span></td><td>Final; contested human-to-human, not in-app.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="foot">
+    Exit OS · CSP App — living spec. Prototype mirrors the shipped mock build (<span class="mono">com.wiom.csp.mock</span>). Copy, tokens and timeline data are pulled from the app's own fixtures. Reason disclosure follows Exit OS §07 + the Enforcement OS FPV note.
+  </div>
+</section>
+
+</main>
 
 <script>
+/* ---------------- prototype data (from app fixtures) ---------------- */
 const WC = ["अब आपको नए काम या कनेक्शन नहीं मिलेंगे","आपके चालू काम अब Wiom का सिस्टम संभालेगा","आपका पैसा सेटल होगा और डिवाइस वापस होंगे"];
 const WI_BANNER={t:"Wiom के साथ अब आपकी साझेदारी समाप्त की जा रही है", s:"स्थिति देखें"};
 const FLOWS = {
@@ -245,13 +570,13 @@ function renderTabs(){
 }
 function sync(){ renderTabs(); }
 
+/* -------- screen renderers (match app) -------- */
 function blocker(f){
   const link = f.statusLink ? `<div class="statuslink" onclick="nav('service')">अपने काम की स्थिति देखें ›</div>` : "";
   const reason = (f.violations&&f.violations.length) ? `<div class="v-reason"><div class="h">कारण</div>${f.violations.map((v,i)=>`<div class="r"${i===0?' style="font-weight:700"':""}>${v}</div>`).join("")}</div>` : "";
   const note = f.contactNote ? `<div class="contact-note">🤝 ${f.contactNote}</div>` : "";
   return `<div class="body" style="padding-top:44px">
-      <div class="notice-kicker">सूचना</div>
-      <div class="notice-rule"></div>
+      <div class="notice-kicker">सूचना</div><div class="notice-rule"></div>
       <div class="headline">${f.title}</div>
       <div class="lead">${f.body}</div>
       ${link}${reason}${note}
@@ -259,7 +584,7 @@ function blocker(f){
       ${WC.map(c=>`<div class="wc-row"><span class="wc-dot"></span><span>${c}</span></div>`).join("")}
       <div class="spacer"></div>
     </div>
-    <div class="foot"><button class="cta" onclick="nav('timeline')">${f.cta}</button></div>`;
+    <div class="foot-cta"><button class="cta" onclick="nav('timeline')">${f.cta}</button></div>`;
 }
 function consequences(f){
   return `<div class="topbar"><span class="bk" onclick="nav('settings')">‹</span><h2>Wiom छोड़ें</h2></div>
@@ -269,7 +594,7 @@ function consequences(f){
       <div class="conseq-note">${f.note}</div>
       <div class="spacer"></div>
     </div>
-    <div class="foot"><button class="cta" onclick="nav('confirm')">${f.cta}</button></div>`;
+    <div class="foot-cta"><button class="cta" onclick="nav('confirm')">${f.cta}</button></div>`;
 }
 function drRow(ic,lab,onclick,red){
   const lab2 = red?`<span class="di-lab" style="color:var(--state-negative);font-weight:800">${lab}</span>`:`<span class="di-lab">${lab}</span>`;
@@ -286,39 +611,27 @@ function vhome(f){
     <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>काम आने पर यहाँ दिखेगा</div></div>
     <div class="tap-hint">☰ मेन्यू → सेटिंग्स → खाता → Wiom के साथ काम बंद करें</div>`;
 }
-// Hamburger drawer (app: पैसे / नेट बॉक्स / टीम / सेटिंग्स / ट्रस्ट लाइन / Debug).
 function drawer(f){
   return `<div class="drawer-wrap">
     <div class="drawer">
       <div class="dr-head"><div class="dr-name">Rajesh Kumar</div><div class="dr-role">CSP-1042 · एडमिन</div></div>
       <div class="dr-body">
-        ${drRow("👛","पैसे")}
-        ${drRow("📶","नेट बॉक्स")}
-        ${drRow("👥","टीम")}
+        ${drRow("👛","पैसे")}${drRow("📶","नेट बॉक्स")}${drRow("👥","टीम")}
         <div class="dr-div"></div>
-        ${drRow("⚙️","सेटिंग्स","nav('settings')")}
-        ${drRow("📞","ट्रस्ट लाइन")}
-        <div class="dr-spacer"></div>
-        <div class="dr-div"></div>
-        ${drRow("🐞","Debug")}
+        ${drRow("⚙️","सेटिंग्स","nav('settings')")}${drRow("📞","ट्रस्ट लाइन")}
+        <div class="dr-spacer"></div><div class="dr-div"></div>${drRow("🐞","Debug")}
       </div>
     </div>
     <div class="dr-scrim" onclick="nav('vhome')"></div>
   </div>`;
 }
-// Settings screen (app SettingsHomeScreen). Exit lives inside the खाता section.
 function settings(f){
   return `<div class="topbar"><span class="bk" onclick="nav('drawer')">‹</span><h2>सेटिंग्स</h2></div>
     <div class="st-list">
       <div class="st-profile"><div class="dr-av">RK</div><div><div class="dr-name">Rajesh Kumar</div><div class="dr-role">CSP-1042 · एडमिन</div></div></div>
-      ${drRow("👤","प्रोफ़ाइल")}
-      ${drRow("🪪","केवाईसी")}
-      ${drRow("🌐","भाषा चुनें")}
-      ${drRow("↩️","लॉगआउट")}
-      <div class="st-sec">दस्तावेज़</div>
-      ${drRow("📄","नियम व दस्तावेज़")}
-      <div class="st-sec">खाता</div>
-      ${drRow("🚪","Wiom के साथ काम बंद करें","nav('first')",true)}
+      ${drRow("👤","प्रोफ़ाइल")}${drRow("🪪","केवाईसी")}${drRow("🌐","भाषा चुनें")}${drRow("↩️","लॉगआउट")}
+      <div class="st-sec">दस्तावेज़</div>${drRow("📄","नियम व दस्तावेज़")}
+      <div class="st-sec">खाता</div>${drRow("🚪","Wiom के साथ काम बंद करें","nav('first')",true)}
     </div>`;
 }
 function confirm(f){
@@ -382,7 +695,6 @@ function timeline(f){
     <div class="tl-card" style="margin-top:16px"><div class="tl-h">आगे क्या होगा</div>${rows}</div>
     ${abort}`;
 }
-
 function renderScreen(f){
   switch(screen){
     case "vhome":   return vhome(f);
@@ -395,40 +707,65 @@ function renderScreen(f){
     default:        return firstScreen(f);
   }
 }
+
+/* -------- inspector: the server payload behind the current screen -------- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function wireJson(f){
+  const cls = flow==='vol'?'VOLUNTARY':flow==='b1'?'B1_VIABILITY':'B2_INTEGRITY';
+  const obj = {
+    exit_class: cls,
+    class_display: f.reason,
+    headline_display: f.title,
+    timeline_display: f.anchor||"",
+    abortable: !!f.abortable,
+    steps: f.steps.map(s=>({state:s.k==='done'?'DONE':s.k==='cur'?'CURRENT':'UPCOMING', label_display:s.lab, timer_display:s.d||undefined, affects_display:s.aff||undefined}))
+  };
+  if(f.violations) obj.violations = f.violations;
+  if(f.pointOfNoReturn) obj.point_of_no_return_note = f.pointOfNoReturn;
+  let j = JSON.stringify(obj,null,2);
+  j = esc(j)
+    .replace(/&quot;([a-z_]+)&quot;:/g,'<span class="k">&quot;$1&quot;</span>:')
+    .replace(/: (&quot;[^&]*&quot;)/g,': <span class="s">$1</span>')
+    .replace(/: (true|false)/g,': <span class="b">$1</span>');
+  return j;
+}
 function render(){
   const f=FLOWS[flow];
   $("#screen").innerHTML = renderScreen(f);
-  // Mock status bar: cream on the full-page blocker (no maroon top bar), else maroon.
   const creamSb = (screen==="first" && f.kind!=="voluntary");
   const sb=document.querySelector('.sb');
   if(sb){ sb.style.background = creamSb ? "var(--bg-screen)" : "var(--maroon)";
           sb.style.color = creamSb ? "var(--text-1)" : "var(--header-text)"; }
-  const d={
-    vol:"CSP-initiated · cancelable. <b>Home ☰ → मेन्यू → सेटिंग्स → खाता → Wiom के साथ काम बंद करें</b> → consequences → confirm sheet → abortable timeline.",
-    b1:"Underperformance · no blame. Notice + a link to <b>काम की स्थिति</b> (why), then the exit timeline.",
-    b2:"Rule violation · final. Reason is shown (Enforcement OS · FPV): the <b>violation type</b> + a direct-contact line to contest. <span class='tag'>FPV: reason in-app</span>",
-  };
+  $("#wire").innerHTML = wireJson(f);
   const inter={
-    vol:`<p><b>☰ hamburger</b> → opens the <b>drawer</b> (पैसे · नेट बॉक्स · टीम · सेटिंग्स · ट्रस्ट लाइन).</p>
-      <p><b>सेटिंग्स</b> → Settings → scroll to <b>खाता</b> → <b>Wiom के साथ काम बंद करें</b> (red) → <b>consequences</b>.</p>
-      <p><b>आगे बढ़ें</b> → <b>confirm sheet</b> → <b>हाँ, बाहर निकलें</b> → timeline.</p>
-      <p>Drawer scrim / <b>‹ back</b> arrows navigate too.</p>`,
-    b1:`<p><b>CTA</b> → opens the <b>exit timeline</b>.</p>
-      <p><b>अपने काम की स्थिति देखें</b> → <b>service status</b> page.</p>
-      <p><b>Home banner</b> → exit timeline.</p>`,
-    b2:`<p><b>CTA</b> → opens the <b>exit timeline</b>.</p>
-      <p><b>Home banner</b> → exit timeline. <b>‹ back</b> arrows navigate too.</p>`,
+    vol:`<p><b>☰ hamburger</b> → drawer (पैसे · नेट बॉक्स · टीम · सेटिंग्स · ट्रस्ट लाइन).</p>
+      <p><b>सेटिंग्स</b> → खाता → <b>Wiom के साथ काम बंद करें</b> → consequences.</p>
+      <p><b>आगे बढ़ें</b> → confirm sheet → <b>हाँ, बाहर निकलें</b> → timeline (abortable).</p>`,
+    b1:`<p><b>CTA</b> → exit timeline.</p><p><b>अपने काम की स्थिति देखें</b> → सेवा स्थिति page.</p><p><b>Home banner</b> → timeline.</p>`,
+    b2:`<p><b>CTA</b> → exit timeline.</p><p>FPV reason (<b>अतिरिक्त कैश</b>) shows on the notice + timeline.</p><p><b>Home banner</b> → timeline.</p>`,
   };
-  $("#notes").innerHTML=`
-    <h3>Interactions (click the phone)</h3>
-    <div class="box">${inter[flow]}</div>
-    <h3>Timeline styling</h3>
-    <div class="box"><p><b style="color:var(--state-caution)">कारण-…</b> reason is <b>orange</b>; the heading &amp; dates are <b>black</b>.</p></div>
-    <h3>${flow==="vol"?"Voluntary (self-exit)":flow==="b2"?"B2 · Integrity":"B1 · Viability"}</h3>
-    <div class="box"><p>${d[flow]}</p></div>`;
+  $("#notes").innerHTML=`<h5>Try it</h5><div class="box">${inter[flow]}</div>`;
 }
+
+/* -------- wiring -------- */
 document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow; screen=SCREENS[flow][0][0];
   document.querySelectorAll(".seg.flow button").forEach(x=>x.setAttribute("aria-pressed",x===b)); sync(); render();});
+
+/* top-level tabs */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
+  const t=b.dataset.tab;
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected', x===b));
+  document.querySelectorAll('main .panel').forEach(p=>p.hidden = (p.id!==t));
+  window.scrollTo({top:0,behavior:'instant'});
+});
+
+/* theme toggle */
+const root=document.documentElement;
+document.getElementById('themeToggle').onclick=()=>{
+  const cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  root.setAttribute('data-theme', cur==='dark'?'light':'dark');
+};
+
 sync(); render();
 </script>
 </body>
