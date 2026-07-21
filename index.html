@@ -7,58 +7,59 @@
 <style>
   /* ============================================================
      Exit OS — living spec + prototype (CSP App)
-     App theme, sampled from device: cream #FBEED8 · maroon #642A2E
-     · rose-pink #DE1879 · brown ink #37261C.
+     Tokens verbatim from WiomTokens.kt: brand #D9008D · plum #4A1535
+     · bg #FAF9FC · ink #161021 · Noto Sans Devanagari.
      ============================================================ */
   :root{
-    /* app tokens (from device) — used by the phone prototype */
-    --brand:#DE1879; --brand-pressed:#B31060; --brand-tint:#FBE0EC;
-    --maroon:#642A2E; --header-text:#FFF3DB;
-    --text-1:#37261C; --text-2:#736160; --text-hint:#A89A86; --text-on-warn:#4A3705;
-    --bg-screen:#FBEED8; --bg-surface:#FFF6E1; --bg-neutral:#F4E8CF;
-    --bg-warning:#FCE7A6; --bg-negative:#FBE0DE; --bg-positive:#DFF3E2;
-    --state-positive:#1E7A44; --state-negative:#C0392B; --state-caution:#EA5E00;
-    --stroke-1:#ECDEC3; --stroke-2:#DBCBA9;
+    /* app DS tokens — verbatim from WiomTokens.kt (§1.1) */
+    --brand:#D9008D; --brand-pressed:#A30070; --brand-tint:#FFE5F6; --brand-stroke:#FFB2E4;
+    --plum:#4A1535; --header-text:#FFFFFF;
+    --text-1:#161021; --text-2:#5C5570; --text-hint:#A7A1B2; --text-on-warn:#372902;
+    --bg-screen:#FAF9FC; --bg-surface:#FFFFFF; --bg-neutral:#F1EDF7;
+    --bg-warning:#FFF2BF; --bg-warning-tint:#FFE6CC; --bg-negative:#FFE5E7; --bg-positive:#E1FAED; --bg-info:#F1E5FF;
+    --state-positive:#008043; --state-negative:#D92130; --state-caution:#E65100; --state-info:#6D17CE; --icon-warning:#E2B203;
+    --stroke-1:#E8E4F0; --stroke-2:#D7D3E0; --stroke-warn-focus:#FF8000;
+    /* DS radius (§1.4): card 12 · cta/large 16 · chip 8 · tiny 4 */
     --r-lg:16px; --r-md:12px; --r-sm:8px;
 
-    /* document palette (light) — warm neutrals, pink spent sparingly */
-    --ground:#F4EBDA; --panel:#FFFDF7; --panel-2:#FBF3E4;
-    --ink:#37261C; --ink-2:#6E5D4A; --ink-3:#A18F78;
-    --line:#E7D8BE; --line-2:#EFE4CE;
-    --accent:#C4136E; --accent-soft:#FBE0EC; --code-bg:#F3EAD6;
+    /* document palette (light) — plum-biased neutrals, pink spent sparingly */
+    --ground:#F7F4F9; --panel:#FFFFFF; --panel-2:#FBF9FC;
+    --ink:#1A1220; --ink-2:#5C5570; --ink-3:#8B8398;
+    --line:#E6E1EC; --line-2:#EFEBF4;
+    --accent:#C1007E; --accent-soft:#FCE4F3; --code-bg:#F4F1F8;
 
+    /* DS type: Noto Sans Devanagari / system default (§1.2). Weights 400/600/700 */
     --font-display:"Segoe UI",system-ui,-apple-system,sans-serif;
     --font-body:system-ui,-apple-system,"Segoe UI",sans-serif;
-    --font-mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+    --font-mono:ui-monospace,"Cascadia Code","Cascadia Mono",Consolas,monospace;
     --font-deva:"Noto Sans Devanagari","Nirmala UI",system-ui,sans-serif;
-    --shadow:0 1px 2px rgba(55,38,28,.05),0 8px 24px -12px rgba(55,38,28,.16);
-    --shadow-lift:0 2px 6px rgba(55,38,28,.08),0 18px 40px -18px rgba(100,42,46,.30);
+    --shadow:0 1px 2px rgba(22,16,33,.04),0 8px 24px -12px rgba(22,16,33,.14);
+    --shadow-lift:0 2px 6px rgba(22,16,33,.06),0 18px 40px -18px rgba(74,21,53,.28);
   }
+  /* Dark = document chrome only; the phone keeps the DS light theme (v1.0 is light-only) */
   @media (prefers-color-scheme: dark){
     :root{
-      --ground:#1C1410; --panel:#261C16; --panel-2:#2E231B;
-      --ink:#F6ECDC; --ink-2:#C9B9A5; --ink-3:#8C7B67;
-      --line:#3A2C21; --line-2:#31251C;
-      --accent:#FF6FB0; --accent-soft:#3A121F; --code-bg:#2A2018;
-      --bg-screen:#241A14; --bg-surface:#2C211A; --bg-neutral:#33271E;
-      --text-1:#F6ECDC; --text-2:#C9B9A5; --text-hint:#8C7B67;
-      --stroke-1:#3A2C21; --stroke-2:#4A392C;
-      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+      --ground:#16101C; --panel:#1F1727; --panel-2:#241B2E;
+      --ink:#F3EEF8; --ink-2:#B9AEC7; --ink-3:#857992;
+      --line:#33283F; --line-2:#2A2135;
+      --accent:#FF57C0; --accent-soft:#3A1030; --code-bg:#241B2E;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6);
+      --shadow-lift:0 2px 6px rgba(0,0,0,.4),0 18px 40px -18px rgba(0,0,0,.7);
     }
   }
   :root[data-theme="dark"]{
-    --ground:#1C1410; --panel:#261C16; --panel-2:#2E231B;
-    --ink:#F6ECDC; --ink-2:#C9B9A5; --ink-3:#8C7B67; --line:#3A2C21; --line-2:#31251C;
-    --accent:#FF6FB0; --accent-soft:#3A121F; --code-bg:#2A2018;
-    --bg-screen:#241A14; --bg-surface:#2C211A; --bg-neutral:#33271E;
-    --text-1:#F6ECDC; --text-2:#C9B9A5; --text-hint:#8C7B67; --stroke-1:#3A2C21; --stroke-2:#4A392C;
+    --ground:#16101C; --panel:#1F1727; --panel-2:#241B2E;
+    --ink:#F3EEF8; --ink-2:#B9AEC7; --ink-3:#857992;
+    --line:#33283F; --line-2:#2A2135;
+    --accent:#FF57C0; --accent-soft:#3A1030; --code-bg:#241B2E;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.4),0 18px 40px -18px rgba(0,0,0,.7);
   }
   :root[data-theme="light"]{
-    --ground:#F4EBDA; --panel:#FFFDF7; --panel-2:#FBF3E4;
-    --ink:#37261C; --ink-2:#6E5D4A; --ink-3:#A18F78; --line:#E7D8BE; --line-2:#EFE4CE;
-    --accent:#C4136E; --accent-soft:#FBE0EC; --code-bg:#F3EAD6;
-    --bg-screen:#FBEED8; --bg-surface:#FFF6E1; --bg-neutral:#F4E8CF;
-    --text-1:#37261C; --text-2:#736160; --text-hint:#A89A86; --stroke-1:#ECDEC3; --stroke-2:#DBCBA9;
+    --ground:#F7F4F9; --panel:#FFFFFF; --panel-2:#FBF9FC;
+    --ink:#1A1220; --ink-2:#5C5570; --ink-3:#8B8398;
+    --line:#E6E1EC; --line-2:#EFEBF4;
+    --accent:#C1007E; --accent-soft:#FCE4F3; --code-bg:#F4F1F8;
   }
 
   *{box-sizing:border-box}
@@ -71,17 +72,17 @@
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 
   /* ---------- top bar ---------- */
-  header.top{position:sticky;top:0;z-index:50;background:var(--maroon);color:var(--header-text);border-bottom:1px solid rgba(255,255,255,.08)}
+  header.top{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--plum) 96%,black);color:#F3E8EF;border-bottom:1px solid rgba(255,255,255,.08)}
   .top-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px;min-height:60px;flex-wrap:wrap}
   .brand-mark{display:flex;align-items:baseline;gap:10px;font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-.01em;color:#fff}
   .brand-mark .infi{color:var(--brand);font-size:20px}
-  .brand-mark small{font-weight:500;font-size:12px;color:#E7C9B4;letter-spacing:.02em}
+  .brand-mark small{font-weight:500;font-size:12px;color:#C9A9BE;letter-spacing:.02em}
   nav.tabs{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
-  nav.tabs button{appearance:none;border:0;background:transparent;cursor:pointer;color:#E7CFC0;font-family:var(--font-display);font-weight:650;font-size:13.5px;padding:8px 14px;border-radius:999px;transition:all .15s}
-  nav.tabs button:hover{color:#fff;background:rgba(255,255,255,.08)}
-  nav.tabs button[aria-selected="true"]{color:var(--maroon);background:#fff}
-  .theme-btn{appearance:none;border:1px solid rgba(255,255,255,.20);background:transparent;color:#F0DDCB;width:34px;height:34px;border-radius:999px;cursor:pointer;display:grid;place-items:center;font-size:15px}
-  .theme-btn:hover{background:rgba(255,255,255,.10)}
+  nav.tabs button{appearance:none;border:0;background:transparent;cursor:pointer;color:#D8C3D0;font-family:var(--font-display);font-weight:650;font-size:13.5px;padding:8px 14px;border-radius:999px;transition:all .15s}
+  nav.tabs button:hover{color:#fff;background:rgba(255,255,255,.06)}
+  nav.tabs button[aria-selected="true"]{color:var(--plum);background:#fff}
+  .theme-btn{appearance:none;border:1px solid rgba(255,255,255,.18);background:transparent;color:#E9D8E2;width:34px;height:34px;border-radius:999px;cursor:pointer;display:grid;place-items:center;font-size:15px}
+  .theme-btn:hover{background:rgba(255,255,255,.08)}
 
   /* ---------- layout + doc components ---------- */
   main{max-width:1200px;margin:0 auto;padding:34px 24px 90px}
@@ -145,8 +146,8 @@
   .proto-grid{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:28px;align-items:start;margin-top:24px}
   @media (max-width:940px){.proto-grid{grid-template-columns:1fr}}
   .phone-wrap{display:flex;justify-content:center}
-  .phone{width:390px;max-width:100%;background:#1c120e;border-radius:40px;padding:9px;box-shadow:var(--shadow-lift);position:sticky;top:84px;overflow:hidden}
-  .sb{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:700;background:var(--maroon);color:var(--header-text);border-radius:32px 32px 0 0}
+  .phone{width:390px;max-width:100%;background:#0e0a12;border-radius:40px;padding:9px;box-shadow:var(--shadow-lift);position:sticky;top:84px;overflow:hidden}
+  .sb{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:700;background:var(--plum);color:var(--header-text);border-radius:32px 32px 0 0}
   .screen{height:720px;overflow-y:auto;display:flex;flex-direction:column;position:relative;background:var(--bg-screen);border-radius:0 0 32px 32px;font-family:var(--font-deva)}
   .screen::-webkit-scrollbar{width:0}
   .controls{display:flex;flex-direction:column;gap:16px;position:sticky;top:84px}
@@ -167,7 +168,7 @@
 
   /* ---------- phone screen components (match app) ---------- */
   .body{flex:1;padding:0 22px;display:flex;flex-direction:column}
-  .topbar{display:flex;align-items:center;gap:14px;padding:14px 20px 16px;background:var(--maroon)}
+  .topbar{display:flex;align-items:center;gap:14px;padding:14px 20px 16px;background:var(--plum)}
   .topbar .bk{font-size:20px;color:var(--header-text);cursor:pointer}
   .topbar h2{font-size:16px;font-weight:700;color:var(--header-text)}
   .notice-kicker{font-size:16px;font-weight:800;color:var(--state-negative);letter-spacing:.4px}
@@ -193,10 +194,10 @@
   .ham{font-size:22px;color:var(--header-text);cursor:pointer;line-height:1;padding:2px 4px}
   .tap-hint{margin:20px 22px 0;font-size:12.5px;font-weight:700;color:var(--brand);background:var(--brand-tint);border-radius:999px;padding:9px 14px;text-align:center}
   .drawer-wrap{position:absolute;inset:0;display:flex;z-index:5}
-  .drawer{width:78%;max-width:320px;background:var(--bg-surface);display:flex;flex-direction:column;box-shadow:2px 0 30px rgba(30,15,10,.30);animation:slideIn .18s ease}
+  .drawer{width:78%;max-width:320px;background:var(--bg-surface);display:flex;flex-direction:column;box-shadow:2px 0 30px rgba(22,16,33,.28);animation:slideIn .18s ease}
   @keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
-  .dr-scrim{flex:1;background:rgba(30,15,10,.45);cursor:pointer}
-  .dr-head{background:var(--maroon);color:var(--header-text);padding:46px 22px 22px}
+  .dr-scrim{flex:1;background:rgba(22,16,33,.42);cursor:pointer}
+  .dr-head{background:var(--plum);color:var(--header-text);padding:46px 22px 22px}
   .dr-head .dr-name{font-size:20px;font-weight:800;color:var(--header-text)}
   .dr-head .dr-role{font-size:13px;opacity:.85;margin-top:4px}
   .dr-body{flex:1;display:flex;flex-direction:column;padding:8px 0;overflow:auto}
@@ -210,7 +211,7 @@
   .dr-name{font-size:16px;font-weight:800;color:var(--text-1)} .dr-role{font-size:12.5px;color:var(--text-2);margin-top:2px}
   .st-sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--text-hint);padding:20px 22px 4px}
   .sheet-wrap{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;z-index:6}
-  .sheet-scrim{position:absolute;inset:0;background:rgba(30,15,10,.45);cursor:pointer}
+  .sheet-scrim{position:absolute;inset:0;background:rgba(22,16,33,.42);cursor:pointer}
   .sheet{position:relative;background:var(--bg-surface);border-radius:22px 22px 0 0;padding:10px 22px 24px;animation:sheetUp .2s ease}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   .sheet-grab{width:40px;height:4px;border-radius:99px;background:var(--stroke-2);margin:4px auto 16px}
@@ -273,7 +274,7 @@
 <section class="panel" id="proto" role="tabpanel">
   <div class="eyebrow">Living prototype · matches the shipped app</div>
   <h2 class="section-h">Three ways a partnership ends — live.</h2>
-  <p class="lede">Every screen below is rendered from the same tokens, copy and state the CSP app ships — cream <span class="mono">#FBEED8</span>, maroon <span class="mono">#642A2E</span>, rose-pink <span class="mono">#DE1879</span>. Pick a flow, then tap through the phone. <strong>Voluntary</strong> starts on Home → ☰ → सेटिंग्स → खाता. <strong>B1</strong> and <strong>B2</strong> are Wiom-initiated — a full-page notice on app open, then the timeline. The inspector shows the exact <span class="mono">GET /exit/status</span> payload behind the current screen.</p>
+  <p class="lede">Every screen below is rendered from the app's own <strong>design-system tokens</strong> (<span class="mono">WiomTokens.kt</span>) — brand <span class="mono">#D9008D</span>, plum header <span class="mono">#4A1535</span>, surface <span class="mono">#FAF9FC</span>, ink <span class="mono">#161021</span>, Noto Sans Devanagari. Pick a flow, then tap through the phone. <strong>Voluntary</strong> starts on Home → ☰ → सेटिंग्स → खाता. <strong>B1</strong> and <strong>B2</strong> are Wiom-initiated — a full-page notice on app open, then the timeline. The inspector shows the exact <span class="mono">GET /exit/status</span> payload behind the current screen.</p>
 
   <div class="proto-grid">
     <div class="phone-wrap">
@@ -734,7 +735,7 @@ function render(){
   $("#screen").innerHTML = renderScreen(f);
   const creamSb = (screen==="first" && f.kind!=="voluntary");
   const sb=document.querySelector('.sb');
-  if(sb){ sb.style.background = creamSb ? "var(--bg-screen)" : "var(--maroon)";
+  if(sb){ sb.style.background = creamSb ? "var(--bg-screen)" : "var(--plum)";
           sb.style.color = creamSb ? "var(--text-1)" : "var(--header-text)"; }
   $("#wire").innerHTML = wireJson(f);
   const inter={
