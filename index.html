@@ -609,28 +609,29 @@ function drRow(ic,lab,onclick,red){
   return `<div class="dr-item"${onclick?` onclick="${onclick}"`:""}><span class="di-ic">${ic}</span>${lab2}<span class="di-cv">›</span></div>`;
 }
 function task(ic,tt,ts){return `<div class="task"><span class="ti">${ic}</span><div class="tc"><div class="tt">${tt}</div><div class="ts">${ts}</div></div><span class="tv">›</span></div>`;}
-function vhome(f){
-  const head=`<div class="topbar"><span class="ham" onclick="nav('drawer')">☰</span><h2>Rajesh Kumar · एडमिन</h2></div>`;
-  const strip=`<div class="strip">
+function homeHead(ham){ return `<div class="topbar"><span class="ham" ${ham?`onclick="${ham}"`:""}>☰</span><h2>Rajesh Kumar · एडमिन</h2></div>`; }
+const HOME_STRIP=`<div class="strip">
       <div class="tile"><div class="k">कनेक्शन</div><div class="v">18<span style="color:var(--text-hint);font-size:13px">/45</span></div></div>
       <div class="tile"><div class="k">सेवा स्थिति</div><div class="v" style="color:var(--state-positive);font-size:15px">✓ ठीक है</div></div>
       <div class="tile"><div class="k">कमाई</div><div class="v">₹10,740</div></div>
       <div class="tile"><div class="k">काम की स्थिति</div><div class="v" style="color:var(--state-positive)">✓</div></div>
     </div>`;
-  if(declared){
-    // Exit declared → tasks removed, exit banner shown.
-    return head + strip +
-      `<div class="banner" onclick="nav('timeline')"><span class="ic">⚠️</span><div style="min-width:0"><div class="t">${f.banner.t}</div><div class="s">${f.banner.s}</div></div><span class="cv">›</span></div>
-       <div class="empty"><div class="h">अभी कोई काम नहीं है</div></div>`;
-  }
-  // Normal state → all tasks visible, no banner.
-  return head + strip +
-    `<div class="sec-lbl">आज के काम</div>
+const TASKLIST=`<div class="sec-lbl">आज के काम</div>
      <div class="tasklist">
        ${task("🔧","इंस्टॉल · #1100","नया कनेक्शन लगाना है")}
        ${task("🛠️","सर्विस · #2245","नेट नहीं चल रहा")}
        ${task("💳","रीचार्ज","3 कनेक्शन बाकी")}
      </div>`;
+// Normal Home with today's tasks — the base every launch opens on.
+function homeTasks(ham){ return homeHead(ham) + HOME_STRIP + TASKLIST; }
+function vhome(f){
+  if(declared){
+    // Exit declared → tasks removed, exit banner shown.
+    return homeHead("nav('drawer')") + HOME_STRIP +
+      `<div class="banner" onclick="nav('timeline')"><span class="ic">⚠️</span><div style="min-width:0"><div class="t">${f.banner.t}</div><div class="s">${f.banner.s}</div></div><span class="cv">›</span></div>
+       <div class="empty"><div class="h">अभी कोई काम नहीं है</div></div>`;
+  }
+  return homeTasks("nav('drawer')");
 }
 function drawer(f){
   return `<div class="drawer-wrap">
@@ -669,8 +670,9 @@ function confirm(f){
 }
 function firstScreen(f){
   if(f.kind==="voluntary") return consequences(f);
-  // Wiom-initiated: the app launches to Home; the blocker drops in ~1s later.
-  return `${home(f)}<div class="blocker-overlay">${blocker(f)}</div>`;
+  // Launch: app opens on the normal Home (आज के काम list), then the blocker
+  // blocks the whole app ~1s later.
+  return homeTasks("") + `<div class="blocker-overlay">${blocker(f)}</div>`;
 }
 function service(f){
   return `<div class="topbar"><span class="bk" onclick="nav('first')">‹</span><h2>सेवा स्थिति</h2></div>
