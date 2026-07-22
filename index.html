@@ -210,7 +210,7 @@
   .dr-av{width:46px;height:46px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;display:grid;place-items:center;font-size:16px;flex:none}
   .dr-name{font-size:16px;font-weight:800;color:var(--text-1)} .dr-role{font-size:12.5px;color:var(--text-2);margin-top:2px}
   .st-sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--text-hint);padding:20px 22px 4px}
-  .sheet-wrap{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;z-index:6}
+  .sheet-wrap{position:absolute;top:0;left:0;right:0;height:720px;display:flex;flex-direction:column;justify-content:flex-end;z-index:6}
   .sheet-scrim{position:absolute;inset:0;background:rgba(22,16,33,.42);cursor:pointer}
   .sheet{position:relative;background:var(--bg-surface);border-radius:22px 22px 0 0;padding:10px 22px 24px;animation:sheetUp .2s ease}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -657,7 +657,8 @@ function settings(f){
     </div>`;
 }
 function confirm(f){
-  return `<div class="sheet-wrap">
+  // The confirm sheet overlays the consequences page (dimmed behind the scrim).
+  return consequences(f) + `<div class="sheet-wrap">
     <div class="sheet-scrim" onclick="nav('first')"></div>
     <div class="sheet">
       <div class="sheet-grab"></div>
