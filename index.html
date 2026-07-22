@@ -258,6 +258,9 @@
   .abort .ab-d{font-size:12.5px;color:var(--text-on-warn);opacity:.85;margin-top:4px}
   .abort .ab-pnr{font-size:12.5px;font-weight:700;color:var(--state-caution);margin-top:6px}
   .cta-outline{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;cursor:pointer;padding:13px;border-radius:var(--r-md);background:#fff;color:var(--brand);border:1.5px solid var(--brand);margin-top:14px}
+  /* B1/B2 launch: app opens on Home, then the blocker drops in after ~1s */
+  .blocker-overlay{position:absolute;top:0;left:0;right:0;height:720px;background:var(--bg-screen);display:flex;flex-direction:column;overflow-y:auto;z-index:4;animation:blockerDrop .34s cubic-bezier(.2,.7,.3,1) 1s both}
+  @keyframes blockerDrop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -664,7 +667,11 @@ function confirm(f){
     </div>
   </div>`;
 }
-function firstScreen(f){ return f.kind==="voluntary" ? consequences(f) : blocker(f); }
+function firstScreen(f){
+  if(f.kind==="voluntary") return consequences(f);
+  // Wiom-initiated: the app launches to Home; the blocker drops in ~1s later.
+  return `${home(f)}<div class="blocker-overlay">${blocker(f)}</div>`;
+}
 function service(f){
   return `<div class="topbar"><span class="bk" onclick="nav('first')">‹</span><h2>सेवा स्थिति</h2></div>
     <div class="ss-state"><span>⚠️</span><span>सेवा स्थिति खतरे में — 2 चीज़ें सुधारें</span></div>
@@ -750,16 +757,15 @@ function wireJson(f){
 function render(){
   const f=FLOWS[flow];
   $("#screen").innerHTML = renderScreen(f);
-  const creamSb = (screen==="first" && f.kind!=="voluntary");
+  // Status bar always plum — the phone launches into the app (Home) on every screen.
   const sb=document.querySelector('.sb');
-  if(sb){ sb.style.background = creamSb ? "var(--bg-screen)" : "var(--plum)";
-          sb.style.color = creamSb ? "var(--text-1)" : "var(--header-text)"; }
+  if(sb){ sb.style.background="var(--plum)"; sb.style.color="var(--header-text)"; }
   const inter={
     vol:`<p><b>☰ hamburger</b> → drawer (पैसे · नेट बॉक्स · टीम · सेटिंग्स · ट्रस्ट लाइन).</p>
       <p><b>सेटिंग्स</b> → खाता → <b>Wiom के साथ काम बंद करें</b> → consequences.</p>
       <p><b>आगे बढ़ें</b> → confirm sheet → <b>हाँ, बाहर निकलें</b> → timeline (abortable).</p>`,
-    b1:`<p><b>CTA</b> → exit timeline.</p><p><b>अपने काम की स्थिति देखें</b> → सेवा स्थिति page.</p><p><b>Home banner</b> → timeline.</p>`,
-    b2:`<p><b>CTA</b> → exit timeline.</p><p>FPV reason (<b>अतिरिक्त कैश</b>) shows on the notice + timeline.</p><p><b>Home banner</b> → timeline.</p>`,
+    b1:`<p><b>Launch:</b> app opens on Home, then the blocker <b>drops in after ~1s</b>.</p><p><b>CTA</b> → exit timeline.</p><p><b>अपने काम की स्थिति देखें</b> → सेवा स्थिति page.</p>`,
+    b2:`<p><b>Launch:</b> app opens on Home, then the blocker <b>drops in after ~1s</b>.</p><p><b>CTA</b> → exit timeline.</p><p>FPV reason (<b>अतिरिक्त कैश</b>) on the notice + timeline.</p>`,
   };
   $("#notes").innerHTML=`<h5>Try it</h5><div class="box">${inter[flow]}</div>`;
 }
