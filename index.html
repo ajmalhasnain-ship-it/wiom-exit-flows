@@ -300,10 +300,6 @@
         <h4 style="margin-top:16px">Screen</h4>
         <div class="seg scr" role="group" aria-label="Screen"></div>
       </div>
-      <div class="inspector">
-        <div class="ttl">◦ current screen — from GET /exit/status</div>
-        <pre id="wire"></pre>
-      </div>
       <div class="notes" id="notes"></div>
     </div>
   </div>
@@ -631,8 +627,7 @@ function vhome(f){
        ${task("🔧","इंस्टॉल · #1100","नया कनेक्शन लगाना है")}
        ${task("🛠️","सर्विस · #2245","नेट नहीं चल रहा")}
        ${task("💳","रीचार्ज","3 कनेक्शन बाकी")}
-     </div>
-     <div class="tap-hint">☰ मेन्यू → सेटिंग्स → खाता → Wiom के साथ काम बंद करें</div>`;
+     </div>`;
 }
 function drawer(f){
   return `<div class="drawer-wrap">
@@ -759,7 +754,6 @@ function render(){
   const sb=document.querySelector('.sb');
   if(sb){ sb.style.background = creamSb ? "var(--bg-screen)" : "var(--plum)";
           sb.style.color = creamSb ? "var(--text-1)" : "var(--header-text)"; }
-  $("#wire").innerHTML = wireJson(f);
   const inter={
     vol:`<p><b>☰ hamburger</b> → drawer (पैसे · नेट बॉक्स · टीम · सेटिंग्स · ट्रस्ट लाइन).</p>
       <p><b>सेटिंग्स</b> → खाता → <b>Wiom के साथ काम बंद करें</b> → consequences.</p>
