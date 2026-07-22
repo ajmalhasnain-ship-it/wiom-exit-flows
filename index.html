@@ -618,7 +618,7 @@ function vhome(f){
     // Exit declared → tasks removed, exit banner shown.
     return head + strip +
       `<div class="banner" onclick="nav('timeline')"><span class="ic">⚠️</span><div style="min-width:0"><div class="t">${f.banner.t}</div><div class="s">${f.banner.s}</div></div><span class="cv">›</span></div>
-       <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>बाहर निकलने की प्रक्रिया के दौरान नया काम नहीं आएगा</div></div>`;
+       <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>काम आने पर यहाँ दिखेगा</div></div>`;
   }
   // Normal state → all tasks visible, no banner.
   return head + strip +
