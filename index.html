@@ -227,6 +227,12 @@
   .banner .s{font-size:12px;font-weight:700;color:var(--text-on-warn);margin-top:4px}
   .banner .cv{margin-left:auto;color:var(--text-on-warn);opacity:.55;font-size:18px}
   .empty{text-align:center;color:var(--text-2);margin-top:60px} .empty .h{font-size:16px;font-weight:700;color:var(--text-1)}
+  .sec-lbl{padding:14px 20px 2px;font-size:12px;font-weight:800;letter-spacing:.3px;color:var(--text-hint)}
+  .tasklist{padding:6px 20px 20px;display:flex;flex-direction:column;gap:10px}
+  .task{background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:12px 14px;display:flex;align-items:center;gap:12px}
+  .task .ti{width:36px;height:36px;border-radius:9px;background:var(--bg-neutral);display:grid;place-items:center;font-size:17px;flex:none}
+  .task .tc{flex:1;min-width:0} .task .tt{font-size:14px;font-weight:700;color:var(--text-1)} .task .ts{font-size:12px;color:var(--text-2);margin-top:2px}
+  .task .tv{font-size:18px;color:var(--text-hint);flex:none}
   .ss-state{margin:8px 22px 0;background:var(--bg-warning);border-radius:var(--r-md);padding:12px 14px;font-size:14px;font-weight:700;color:var(--text-on-warn);display:flex;gap:8px;align-items:center}
   .ss-secl{margin:16px 22px 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-hint)}
   .ss-card{margin:8px 22px 0;background:var(--bg-surface);border:1px solid var(--stroke-1);border-radius:var(--r-md);padding:2px 16px}
@@ -561,9 +567,11 @@ const SCREENS={
   b1:[["first","Full-page notice"],["service","सेवा स्थिति"],["home","Home banner"],["timeline","Timeline"]],
   b2:[["first","Full-page notice"],["home","Home banner"],["timeline","Timeline"]],
 };
-let flow="vol", screen="vhome";
+let flow="vol", screen="vhome", declared=false;
 const $=s=>document.querySelector(s);
 function nav(s){ screen=s; sync(); render(); }
+function declareExit(){ declared=true; nav('timeline'); }   // tasks vanish, banner appears on Home
+function undeclare(){ declared=false; nav('vhome'); }        // withdraw → normal Home restored
 function renderTabs(){
   const seg=document.querySelector('.seg.scr');
   seg.innerHTML=SCREENS[flow].map(([k,l])=>`<button data-screen="${k}" aria-pressed="${k===screen}">${l}</button>`).join("");
@@ -601,16 +609,30 @@ function drRow(ic,lab,onclick,red){
   const lab2 = red?`<span class="di-lab" style="color:var(--state-negative);font-weight:800">${lab}</span>`:`<span class="di-lab">${lab}</span>`;
   return `<div class="dr-item"${onclick?` onclick="${onclick}"`:""}><span class="di-ic">${ic}</span>${lab2}<span class="di-cv">›</span></div>`;
 }
+function task(ic,tt,ts){return `<div class="task"><span class="ti">${ic}</span><div class="tc"><div class="tt">${tt}</div><div class="ts">${ts}</div></div><span class="tv">›</span></div>`;}
 function vhome(f){
-  return `<div class="topbar"><span class="ham" onclick="nav('drawer')">☰</span><h2>Rajesh Kumar · एडमिन</h2></div>
-    <div class="strip">
+  const head=`<div class="topbar"><span class="ham" onclick="nav('drawer')">☰</span><h2>Rajesh Kumar · एडमिन</h2></div>`;
+  const strip=`<div class="strip">
       <div class="tile"><div class="k">कनेक्शन</div><div class="v">18<span style="color:var(--text-hint);font-size:13px">/45</span></div></div>
       <div class="tile"><div class="k">सेवा स्थिति</div><div class="v" style="color:var(--state-positive);font-size:15px">✓ ठीक है</div></div>
       <div class="tile"><div class="k">कमाई</div><div class="v">₹10,740</div></div>
       <div class="tile"><div class="k">काम की स्थिति</div><div class="v" style="color:var(--state-positive)">✓</div></div>
-    </div>
-    <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>काम आने पर यहाँ दिखेगा</div></div>
-    <div class="tap-hint">☰ मेन्यू → सेटिंग्स → खाता → Wiom के साथ काम बंद करें</div>`;
+    </div>`;
+  if(declared){
+    // Exit declared → tasks removed, exit banner shown.
+    return head + strip +
+      `<div class="banner" onclick="nav('timeline')"><span class="ic">⚠️</span><div style="min-width:0"><div class="t">${f.banner.t}</div><div class="s">${f.banner.s}</div></div><span class="cv">›</span></div>
+       <div class="empty"><div class="h">अभी कोई काम नहीं है</div><div>बाहर निकलने की प्रक्रिया के दौरान नया काम नहीं आएगा</div></div>`;
+  }
+  // Normal state → all tasks visible, no banner.
+  return head + strip +
+    `<div class="sec-lbl">आज के काम</div>
+     <div class="tasklist">
+       ${task("🔧","इंस्टॉल · #1100","नया कनेक्शन लगाना है")}
+       ${task("🛠️","सर्विस · #2245","नेट नहीं चल रहा")}
+       ${task("💳","रीचार्ज","3 कनेक्शन बाकी")}
+     </div>
+     <div class="tap-hint">☰ मेन्यू → सेटिंग्स → खाता → Wiom के साथ काम बंद करें</div>`;
 }
 function drawer(f){
   return `<div class="drawer-wrap">
@@ -642,7 +664,7 @@ function confirm(f){
       <div class="sheet-grab"></div>
       <div class="sheet-h">क्या आप पक्का बाहर निकलना चाहते हैं?</div>
       <div class="sheet-p">आपका अनुरोध दर्ज होगा और नोटिस अवधि शुरू हो जाएगी। माइग्रेशन शुरू होने से पहले तक आप इसे कभी भी रद्द कर सकते हैं।</div>
-      <button class="cta" onclick="nav('timeline')">हाँ, बाहर निकलें</button>
+      <button class="cta" onclick="declareExit()">हाँ, बाहर निकलें</button>
       <button class="cta-ghost" onclick="nav('vhome')">रद्द करें</button>
     </div>
   </div>`;
@@ -688,7 +710,7 @@ function timeline(f){
       <div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div>
       <div class="ab-d">${f.abortDeadline||"माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं"}</div>
       ${f.pointOfNoReturn?`<div class="ab-pnr">${f.pointOfNoReturn}</div>`:""}
-      ${f.abortCta?`<button class="cta-outline" onclick="nav('vhome')">${f.abortCta}</button>`:""}
+      ${f.abortCta?`<button class="cta-outline" onclick="undeclare()">${f.abortCta}</button>`:""}
     </div>` : "";
   return `<div class="topbar"><span class="bk" onclick="nav('${flow==='vol'?'vhome':'home'}')">‹</span><h2>बाहर निकलने की स्थिति</h2></div>
     <div class="reason"><div class="eb">${f.reason}</div><div class="hl">${f.title}</div></div>
@@ -749,7 +771,7 @@ function render(){
 }
 
 /* -------- wiring -------- */
-document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow; screen=SCREENS[flow][0][0];
+document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow; screen=SCREENS[flow][0][0]; declared=false;
   document.querySelectorAll(".seg.flow button").forEach(x=>x.setAttribute("aria-pressed",x===b)); sync(); render();});
 
 /* top-level tabs */
