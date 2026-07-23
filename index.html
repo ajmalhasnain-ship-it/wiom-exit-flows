@@ -302,6 +302,8 @@
         </div>
         <h4 style="margin-top:16px">Screen</h4>
         <div class="seg scr" role="group" aria-label="Screen"></div>
+        <h4 style="margin-top:16px">Timeline stage <span style="text-transform:none;letter-spacing:0;font-family:var(--font-body);font-weight:400;color:var(--ink-3)">— jump to any stage</span></h4>
+        <div class="seg" id="stageSeg"></div>
       </div>
       <div class="notes" id="notes"></div>
     </div>
@@ -568,9 +570,20 @@ const SCREENS={
   b1:[["first","Full-page notice"],["service","सेवा स्थिति"],["home","Home banner"],["timeline","Timeline"]],
   b2:[["first","Full-page notice"],["home","Home banner"],["timeline","Timeline"]],
 };
-let flow="vol", screen="vhome", declared=false;
+let flow="vol", screen="vhome", declared=false, stageIdx=null;
 const $=s=>document.querySelector(s);
 function nav(s){ screen=s; sync(); render(); }
+// Timeline stage toggle: which step is CURRENT (default = the data's own current).
+function currentStageIdx(f){
+  if(stageIdx!==null && stageIdx < f.steps.length) return stageIdx;
+  const i=f.steps.findIndex(s=>s.k==='cur'); return i<0?0:i;
+}
+function renderStageSeg(f){
+  const seg=document.getElementById('stageSeg'); if(!seg) return;
+  const cur=currentStageIdx(f);
+  seg.innerHTML=f.steps.map((s,i)=>`<button data-stage="${i}" aria-pressed="${i===cur}">${s.lab}</button>`).join("");
+  seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{ stageIdx=+b.dataset.stage; screen='timeline'; sync(); render(); });
+}
 function declareExit(){ declared=true; nav('timeline'); }   // tasks vanish, banner appears on Home
 function undeclare(){ declared=false; nav('vhome'); }        // withdraw → normal Home restored
 function renderTabs(){
@@ -710,9 +723,13 @@ function nodeEl(kind){
   return `<div class="nd" style="background:var(--stroke-2)"></div>`;
 }
 function timeline(f){
-  const rows=f.steps.map((s,i)=>`<div class="step ${s.k==='up'?'up':''}">
-      <div class="rail">${nodeEl(s.k)}${i===f.steps.length-1?"":'<div class="line"></div>'}</div>
-      <div class="c"><div class="lab">${s.lab}${s.d?` <span class="d">· ${s.d}</span>`:""}</div>${s.aff?`<div class="aff">${s.aff}</div>`:""}</div></div>`).join("");
+  const cur=currentStageIdx(f);
+  const rows=f.steps.map((s,i)=>{
+    const k = i<cur?'done':i===cur?'cur':'up';   // status follows the selected stage
+    return `<div class="step ${k==='up'?'up':''}">
+      <div class="rail">${nodeEl(k)}${i===f.steps.length-1?"":'<div class="line"></div>'}</div>
+      <div class="c"><div class="lab">${s.lab}${s.d?` <span class="d">· ${s.d}</span>`:""}</div>${s.aff?`<div class="aff">${s.aff}</div>`:""}</div></div>`;
+  }).join("");
   const abort = f.abortable ? `<div class="abort">
       <div class="ab-h">⚠️ अभी भी अपना निर्णय बदल सकते हैं</div>
       <div class="ab-d">${f.abortDeadline||"माइग्रेशन शुरू होने से पहले तक रद्द कर सकते हैं"}</div>
@@ -765,6 +782,7 @@ function render(){
   // Status bar always plum — the phone launches into the app (Home) on every screen.
   const sb=document.querySelector('.sb');
   if(sb){ sb.style.background="var(--plum)"; sb.style.color="var(--header-text)"; }
+  renderStageSeg(f);
   const inter={
     vol:`<p><b>☰ hamburger</b> → drawer (पैसे · नेट बॉक्स · टीम · सेटिंग्स · ट्रस्ट लाइन).</p>
       <p><b>सेटिंग्स</b> → खाता → <b>Wiom के साथ काम बंद करें</b> → consequences.</p>
@@ -776,7 +794,7 @@ function render(){
 }
 
 /* -------- wiring -------- */
-document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow; screen=SCREENS[flow][0][0]; declared=false;
+document.querySelectorAll(".seg.flow button").forEach(b=>b.onclick=()=>{flow=b.dataset.flow; screen=SCREENS[flow][0][0]; declared=false; stageIdx=null;
   document.querySelectorAll(".seg.flow button").forEach(x=>x.setAttribute("aria-pressed",x===b)); sync(); render();});
 
 /* top-level tabs */
